@@ -79,12 +79,19 @@ main{padding:16px 0 calc(48px + env(safe-area-inset-bottom))}
 footer{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 24px}
 [hidden]{display:none!important}
 
-/* 인트로 영상 */
-#intro{position:fixed;inset:0;z-index:100;background:#1B1B1B;transition:opacity .7s ease .1s}
-#intro video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* 인트로 (영상 파일 대신 페이지가 직접 그리는 애니메이션 — 휴대폰·카톡 브라우저에서도 동작) */
+#intro{position:fixed;inset:0;z-index:100;background:#1B1B1B;overflow:hidden;transition:opacity .7s ease .1s}
 #intro.end{background:#FF5F18}
-#intro.end video{opacity:0;transition:opacity .15s}
+#intro.end #st{opacity:0;transition:opacity .15s}
 #intro.out{opacity:0;pointer-events:none}
+#st{position:absolute;left:50%;top:50%;width:1080px;height:1920px;margin:-960px 0 0 -540px;transform-origin:50% 50%}
+#st .glow{position:absolute;inset:0;opacity:0;background:radial-gradient(ellipse at center,rgba(255,95,24,.10),rgba(0,0,0,0) 55%)}
+#st .g{position:absolute;left:0;top:0;width:1080px;height:1920px;display:flex;flex-direction:column;align-items:center;justify-content:center;will-change:transform}
+#st .eb{font:600 40px var(--mono);letter-spacing:.3em;margin-right:-.3em;color:#FF8A57;opacity:0}
+#st .tt{font:400 232px/1.05 var(--display);color:#FFFAEC;margin:22px 0 30px;letter-spacing:-.01em;opacity:0;white-space:nowrap}
+#st .br{height:20px;width:0;background:#FF5F18;border-radius:2px}
+#st .sb{font:600 30px var(--mono);letter-spacing:.22em;margin:34px -.22em 0 0;color:#B8B0A2;opacity:0;white-space:nowrap}
+#st .ov{position:absolute;inset:0;background:#FF5F18;opacity:0}
 #skip{position:absolute;right:max(16px,env(safe-area-inset-right));bottom:calc(20px + env(safe-area-inset-bottom));border:1px solid rgba(255,250,236,.35);background:rgba(27,27,27,.4);color:#FFFAEC;border-radius:999px;padding:7px 14px;font:500 13px var(--body);cursor:pointer}
 html.intro-on{overflow:hidden}
 html.intro-on .top,html.intro-on .bar,html.intro-on main,html.intro-on footer{opacity:0;transform:scale(1.08)}
@@ -94,20 +101,60 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
 </head>
 <body>
 
-<!-- 인트로: 처음 들어왔을 때 한 번만 로고 영상(intro.mp4)을 보여주고, 줌인되며 공지 화면으로 넘어갑니다 -->
+<!-- 인트로: 처음 들어왔을 때 한 번만 로고 연출(약 3초)을 보여주고, 줌인되며 공지 화면으로 넘어갑니다.
+     로고 글자를 바꾸려면 아래 eb(위 작은 글씨) · tt(큰 글씨) · sb(아래 작은 글씨) 안의 글자를 고치면 됩니다. -->
 <div id="intro" hidden>
-  <video id="intro-v" src="intro.mp4" muted playsinline autoplay preload="auto"></video>
+  <div id="st" aria-hidden="true">
+    <div class="glow"></div>
+    <div class="g"><div class="eb">BACKPACK STAY</div><div class="tt">김장대첩</div><div class="br"></div><div class="sb">2026 · KIMCHI ROAD TRAIL</div></div>
+    <div class="ov"></div>
+  </div>
   <button id="skip" type="button">건너뛰기</button>
 </div>
 <script>
 (function () {
-  var html = document.documentElement, box = document.getElementById("intro"), v = document.getElementById("intro-v");
+  var html = document.documentElement, box = document.getElementById("intro"), st = document.getElementById("st");
+  var force = /[?&]intro\b/.test(location.search);
   var seen = false, reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   try { seen = sessionStorage.getItem("kj-intro") === "1"; } catch (e) {}
-  if (seen || reduce || /[?&]nointro\b/.test(location.search)) { box.remove(); return; }
+  if (!force && (seen || reduce || /[?&]nointro\b/.test(location.search))) { box.remove(); return; }
   try { sessionStorage.setItem("kj-intro", "1"); } catch (e) {}
   box.hidden = false; html.classList.add("intro-on");
   var done = false;
+  var q = function (c) { return st.querySelector(c); };
+  var g = q(".g"), eb = q(".eb"), tt = q(".tt"), br = q(".br"), sb = q(".sb"), glow = q(".glow"), ov = q(".ov");
+  var cl = function (x, a, b) { return Math.min(1, Math.max(0, (x - a) / (b - a))); };
+  var eo = function (x) { return 1 - Math.pow(1 - x, 3); }, ei = function (x) { return x * x * x * x; };
+  function fit() { st.style.transform = "scale(" + Math.max(innerWidth / 1080, innerHeight / 1920) + ")"; }
+  fit(); addEventListener("resize", fit);
+  function frame(t) {
+    var a = eo(cl(t, 0, .6)), b = eo(cl(t, .3, 1)), s = eo(cl(t, .5, 1.1)), f = 1 - cl(t, 2, 2.35);
+    tt.style.opacity = a; tt.style.transform = "translateY(" + (1 - a) * 24 + "px)";
+    eb.style.opacity = cl(t, .15, .7) * f; sb.style.opacity = s * f;
+    br.style.width = 440 * b + "px";
+    glow.style.opacity = cl(t, .4, 1.4);
+    var sc = (1 + .05 * cl(t, .6, 2)) * (1 + ei(cl(t, 2, 2.8)) * 110);
+    g.style.transform = "scale(" + sc + ")";
+    ov.style.opacity = cl(t, 2.55, 2.8);
+  }
+  function run() {
+    if (done) return;
+    br.style.width = "440px";
+    g.style.transformOrigin = "540px " + (br.offsetTop + br.offsetHeight / 2) + "px";
+    var t0 = null;
+    (function tick(now) {
+      if (done) return;
+      if (t0 === null) t0 = now;
+      var t = (now - t0) / 1000;
+      frame(t);
+      if (t >= 2.85) reveal(); else requestAnimationFrame(tick);
+    })(performance.now());
+  }
+  /* 글꼴이 준비되면 시작 (늦어도 1.2초 안에 시작) */
+  var started = false;
+  function go() { if (!started) { started = true; requestAnimationFrame(run); } }
+  try { Promise.all([document.fonts.load('400 232px "Black Han Sans"', "김장대첩"), document.fonts.load('600 40px "IBM Plex Mono"', "BACKPACK")]).then(go, go); } catch (e) { go(); }
+  setTimeout(go, 1200);
   function reveal() {
     if (done) return; done = true;
     box.classList.add("end");
@@ -118,11 +165,8 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
       setTimeout(function () { box.remove(); html.classList.remove("intro-reveal"); }, 1100);
     }); });
   }
-  v.addEventListener("ended", reveal);
-  v.addEventListener("error", reveal);
   document.getElementById("skip").addEventListener("click", reveal);
-  var p = v.play && v.play(); if (p && p.catch) p.catch(reveal);
-  setTimeout(reveal, 6000); /* 영상이 늦게 뜨거나 막혀도 6초 뒤엔 화면을 보여줌 */
+  setTimeout(reveal, 7000); /* 어떤 이유로 멈춰도 7초 뒤엔 화면을 보여줌 */
 })();
 </script>
 
