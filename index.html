@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>김장대첩 참가자 안내</title>
+<meta name="description" content="백패커 김장대첩 일정과 공지사항">
+<meta name="theme-color" content="#1B1B1B">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#FFFAEC; --surface:#FFFFFF; --surface-2:#F6F0E2; --ink:#1B1B1B; --muted:#6B6458; --line:#E6DECD;
+  --accent:#FF5F18; --accent-soft:#FFE6D9; --pin:#FFF0C2;
+  --display:"Black Han Sans","IBM Plex Sans KR","Malgun Gothic",sans-serif;
+  --body:"IBM Plex Sans KR","Pretendard","Malgun Gothic",-apple-system,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#151412; --surface:#1F1D1A; --surface-2:#2A2724; --ink:#F4F0E8; --muted:#A9A196; --line:#39352F;
+  --accent:#FF7A3D; --accent-soft:#3A2418; --pin:#382E14; color-scheme:dark;
+}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--body)}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+
+/* 머리글 */
+.top{background:#1B1B1B;color:#FFFAEC;padding:calc(20px + env(safe-area-inset-top)) 0 18px}
+.eyebrow{font:600 11.5px var(--mono);letter-spacing:.08em;color:#FF8A57}
+h1{font:400 clamp(28px,8vw,42px)/1.1 var(--display);margin:6px 0 12px;letter-spacing:-.01em;word-break:keep-all}
+.facts{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.facts li{display:flex;gap:10px;font-size:14px;color:#D9D2C3}
+.facts b{flex:0 0 3.2em;color:#FF8A57;font-weight:500}
+.facts span{color:#FFFAEC;word-break:keep-all}
+
+/* 탭 */
+.bar{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:4px}
+.tab{flex:1;border:0;background:none;padding:13px 6px 11px;font:700 15px var(--body);color:var(--muted);border-bottom:3px solid transparent;cursor:pointer}
+.tab[aria-selected=true]{color:var(--ink);border-color:var(--accent)}
+.tab small{display:block;font:500 11.5px var(--mono);color:var(--muted)}
+main{padding:16px 0 calc(48px + env(safe-area-inset-bottom))}
+
+/* 공지 */
+.sec-h{font:400 22px var(--display);margin:22px 0 10px}
+.notes{display:grid;gap:10px}
+.note{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.note.pin{background:var(--pin);border-color:transparent}
+.note h3{margin:0 0 4px;font-size:15.5px;display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.note p{margin:0;font-size:14px;white-space:pre-line;word-break:keep-all;overflow-wrap:anywhere}
+.note .d{font:500 11.5px var(--mono);color:var(--muted);margin-left:auto}
+.tag{font:700 11px var(--body);background:var(--accent);color:#fff;border-radius:5px;padding:1px 6px}
+
+/* 일정 */
+.now{display:none;margin:0 0 12px;padding:12px 14px;border-radius:12px;background:var(--accent);color:#fff}
+.now.on{display:block}
+.now b{display:block;font-size:16px}
+.now small{opacity:.9}
+.tl{list-style:none;margin:0;padding:0;position:relative}
+.tl::before{content:"";position:absolute;left:52px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.it{display:grid;grid-template-columns:44px 1fr;gap:16px;padding:8px 0;position:relative}
+.it::before{content:"";position:absolute;left:48px;top:17px;width:10px;height:10px;border-radius:50%;background:var(--bg);border:2px solid var(--muted)}
+.it.cur::before{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.it.past{opacity:.55}
+.t{font:600 14px var(--mono);font-variant-numeric:tabular-nums;padding-top:9px;text-align:right}
+.t small{display:block;font-size:11.5px;color:var(--muted);font-weight:500}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px 10px 14px;margin-left:8px;min-width:0}
+.it.cur .card{border-color:var(--accent)}
+.chip{display:inline-block;font-size:11.5px;font-weight:500;border-radius:999px;padding:0 8px;background:var(--surface-2);color:var(--muted);margin-bottom:3px}
+.card h3{margin:0;font-size:16px;line-height:1.35;word-break:keep-all}
+.place{font-size:13px;color:var(--muted);margin-top:2px}
+.desc{font-size:13.5px;margin:4px 0 0;word-break:keep-all;overflow-wrap:anywhere}
+
+.msg{margin:14px 0;padding:10px 12px;border-radius:10px;background:var(--surface-2);font-size:13px;color:var(--muted)}
+.empty{padding:36px 16px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
+footer{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 24px}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow" id="sub"></div>
+    <h1 id="name">김장대첩</h1>
+    <ul class="facts" id="facts"></ul>
+  </div>
+</header>
+
+<nav class="bar" aria-label="보기 선택">
+  <div class="wrap tabs" role="tablist" id="tabs"></div>
+</nav>
+
+<main class="wrap">
+  <div class="msg" id="msg" hidden></div>
+  <div id="view"><div class="empty">일정을 불러오는 중입니다…</div></div>
+</main>
+<footer class="wrap" id="foot"></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  /* schedule.xlsx를 못 읽을 때(예: PC에서 파일을 더블클릭해 열었을 때) 보여줄 예비 데이터 */
+  var FALLBACK = {
+    info: [["행사명","2026 백패커 김장대첩"],["부제","SANTASY SERIES · 김치로드트레일"],["날짜","2026. 11. 28.(토) ~ 11. 29.(일) 1박 2일"],["장소","샘플 오토캠핑장"],["1일차 날짜","2026-11-28"],["2일차 날짜","2026-11-29"]],
+    items: [{day:1,start:"10:30",end:"11:00",session:"오프닝",title:"집결 · 체크인",place:"관리동 앞",desc:"예비 데이터입니다. GitHub에 올리면 schedule.xlsx 내용이 보입니다."}],
+    notes: []
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var D = { info: {}, infoOrder: [], items: [], notes: [] };
+  var view = "notice";
+  var HEAD_KEYS = ["행사명", "부제", "1일차 날짜", "2일차 날짜"];
+
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+
+  /* 엑셀에서 10:30을 입력하면 시간(숫자)으로 바뀌므로 둘 다 처리 */
+  function toTime(v) {
+    if (v == null || v === "") return "";
+    if (typeof v === "number") { var m = Math.round((v % 1) * 1440); return pad(Math.floor(m / 60)) + ":" + pad(m % 60); }
+    var s = String(v).trim(), r = s.match(/^(\d{1,2})\s*[:시.]\s*(\d{2})?/);
+    return r ? pad(+r[1]) + ":" + (r[2] || "00") : s;
+  }
+  function toDate(v) {
+    if (v == null || v === "") return "";
+    if (typeof v === "number") { var d = new Date(Math.round((v - 25569) * 864e5)); return d.getUTCFullYear() + "-" + pad(d.getUTCMonth() + 1) + "-" + pad(d.getUTCDate()); }
+    var r = String(v).match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+    return r ? r[1] + "-" + pad(+r[2]) + "-" + pad(+r[3]) : "";
+  }
+  function mins(t) { var r = /^(\d{2}):(\d{2})$/.exec(t); return r ? +r[1] * 60 + +r[2] : null; }
+
+  function load(info, items, notes) {
+    D.info = {}; D.infoOrder = [];
+    info.forEach(function (r) { var k = String(r[0] || "").trim(); if (!k) return; D.info[k] = r[1] == null ? "" : r[1]; D.infoOrder.push(k); });
+    D.items = items.filter(function (i) { return i.title; }).map(function (i) {
+      return { day: +i.day === 2 ? 2 : 1, start: toTime(i.start), end: toTime(i.end), session: i.session || "", title: i.title, place: i.place || "", desc: i.desc || "" };
+    }).sort(function (a, b) { return a.day - b.day || a.start.localeCompare(b.start); });
+    D.notes = notes.filter(function (n) { return n.title || n.body; }).map(function (n, k) {
+      return { pin: /^(o|ㅇ|y|yes|중요|v|✓|1|true)$/i.test(String(n.pin || "").trim()), title: n.title || "", body: n.body || "", date: toDate(n.date) || String(n.date || ""), k: k };
+    }).sort(function (a, b) { return (b.pin - a.pin) || String(b.date).localeCompare(String(a.date)) || a.k - b.k; });
+  }
+
+  function fromWorkbook(wb) {
+    function rows(name) { var ws = wb.Sheets[name]; return ws ? XLSX.utils.sheet_to_json(ws, { header: 1, defval: "", raw: true }) : []; }
+    function objs(name, map) {
+      var r = rows(name); if (!r.length) return [];
+      var h = r[0].map(function (x) { return String(x).trim(); });
+      return r.slice(1).map(function (row) { var o = {}; for (var key in map) { var i = h.indexOf(map[key]); o[key] = i < 0 ? "" : row[i]; } return o; });
+    }
+    load(rows("행사정보").slice(1),
+         objs("일정", { day: "일차", start: "시작", end: "종료", session: "세션", title: "프로그램", place: "장소", desc: "설명" }),
+         objs("공지", { pin: "중요", title: "제목", body: "내용", date: "게시일" }));
+  }
+
+  function dayDate(d) { return toDate(D.info[d + "일차 날짜"]); }
+  function today() { var n = new Date(); return n.getFullYear() + "-" + pad(n.getMonth() + 1) + "-" + pad(n.getDate()); }
+  function dayLabel(d) {
+    var ds = dayDate(d); if (!ds) return d + "일차";
+    var p = ds.split("-"), w = "일월화수목금토"[new Date(+p[0], +p[1] - 1, +p[2]).getDay()];
+    return d + "일차 · " + (+p[1]) + "/" + (+p[2]) + "(" + w + ")";
+  }
+  function state(i) {
+    var ds = dayDate(i.day), td = today(); if (!ds) return "";
+    if (ds < td) return "past"; if (ds > td) return "";
+    var n = new Date(), now = n.getHours() * 60 + n.getMinutes(), s = mins(i.start), e = mins(i.end);
+    if (s == null) return "";
+    if (e == null) e = s + 30;
+    return now >= e ? "past" : now >= s ? "cur" : "";
+  }
+
+  function renderHead() {
+    $("name").textContent = D.info["행사명"] || "김장대첩";
+    $("sub").textContent = D.info["부제"] || "";
+    document.title = (D.info["행사명"] || "김장대첩") + " 참가자 안내";
+    $("facts").innerHTML = D.infoOrder.filter(function (k) { return HEAD_KEYS.indexOf(k) < 0 && D.info[k] !== ""; })
+      .map(function (k) { return "<li><b>" + esc(k) + "</b><span>" + esc(D.info[k]) + "</span></li>"; }).join("");
+  }
+
+  function renderTabs() {
+    var days = [1, 2].filter(function (d) { return D.items.some(function (i) { return i.day === d; }); });
+    var tabs = [{ v: "notice", t: "공지", s: D.notes.length ? D.notes.length + "건" : "" }].concat(days.map(function (d) {
+      var ds = dayDate(d), p = ds ? ds.split("-") : null;
+      return { v: "d" + d, t: d + "일차", s: p ? (+p[1]) + "/" + (+p[2]) : "" };
+    }));
+    if (!tabs.some(function (x) { return x.v === view; })) view = "notice";
+    $("tabs").innerHTML = tabs.map(function (x) {
+      return '<button class="tab" role="tab" type="button" data-v="' + x.v + '" aria-selected="' + (x.v === view) + '">' + esc(x.t) + (x.s ? "<small>" + esc(x.s) + "</small>" : "") + "</button>";
+    }).join("");
+  }
+
+  function noteHtml(n) {
+    return '<article class="note' + (n.pin ? " pin" : "") + '"><h3>' + (n.pin ? '<span class="tag">중요</span>' : "") + esc(n.title) +
+      (n.date ? '<span class="d">' + esc(n.date) + "</span>" : "") + "</h3><p>" + esc(n.body) + "</p></article>";
+  }
+  function itemHtml(i) {
+    var st = state(i);
+    return '<li class="it ' + st + '"><div class="t">' + esc(i.start) + (i.end ? "<small>~" + esc(i.end) + "</small>" : "") + "</div>" +
+      '<div class="card">' + (i.session ? '<span class="chip">' + esc(i.session) + "</span>" : "") + "<h3>" + esc(i.title) + "</h3>" +
+      (i.place ? '<div class="place">📍 ' + esc(i.place) + "</div>" : "") + (i.desc ? '<p class="desc">' + esc(i.desc) + "</p>" : "") + "</div></li>";
+  }
+
+  function nowBanner() {
+    var cur = D.items.filter(function (i) { return state(i) === "cur"; })[0];
+    var next = D.items.filter(function (i) { return dayDate(i.day) === today() && state(i) === ""; })[0];
+    if (!cur && !next) return "";
+    var i = cur || next;
+    return '<div class="now on"><small>' + (cur ? "지금 진행 중" : "다음 일정") + " · " + esc(i.start) + (i.end ? "~" + esc(i.end) : "") + "</small><b>" + esc(i.title) + "</b>" + (i.place ? "<small>📍 " + esc(i.place) + "</small>" : "") + "</div>";
+  }
+
+  function render() {
+    renderHead(); renderTabs();
+    var html = "";
+    if (view === "notice") {
+      html += nowBanner();
+      html += D.notes.length ? '<div class="notes">' + D.notes.map(noteHtml).join("") + "</div>" : '<div class="empty">아직 공지가 없습니다.</div>';
+    } else {
+      var d = +view.slice(1), list = D.items.filter(function (i) { return i.day === d; });
+      if (dayDate(d) === today()) html += nowBanner();
+      html += '<h2 class="sec-h">' + esc(dayLabel(d)) + "</h2>";
+      html += '<ol class="tl">' + list.map(itemHtml).join("") + "</ol>";
+    }
+    $("view").innerHTML = html;
+    var cur = document.querySelector(".it.cur");
+    if (cur && view !== "notice" && !render.scrolled) { render.scrolled = true; cur.scrollIntoView({ block: "center" }); }
+  }
+
+  $("tabs").addEventListener("click", function (e) {
+    var b = e.target.closest(".tab"); if (!b) return;
+    view = b.dataset.v; try { history.replaceState(null, "", "#" + view); } catch (x) {}
+    render(); window.scrollTo({ top: document.querySelector(".bar").offsetTop, behavior: "smooth" });
+  });
+
+  function startView() {
+    var h = location.hash.slice(1);
+    if (/^(notice|d1|d2)$/.test(h)) return h;
+    var td = today();
+    if (dayDate(1) === td) return "d1";
+    if (dayDate(2) === td) return "d2";
+    return "notice";
+  }
+
+  function showMsg(t) { $("msg").textContent = t; $("msg").hidden = !t; }
+
+  function boot() {
+    if (!window.XLSX || location.protocol === "file:") return Promise.reject(new Error("local"));
+    return fetch("schedule.xlsx?v=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.arrayBuffer(); })
+      .then(function (buf) { fromWorkbook(XLSX.read(buf, { type: "array" })); });
+  }
+
+  boot().then(function () { showMsg(""); }, function (err) {
+    load(FALLBACK.info, FALLBACK.items, FALLBACK.notes);
+    showMsg(err && err.message === "local"
+      ? "PC에서 파일을 직접 열면 엑셀을 읽지 못해 예비 내용만 보입니다. GitHub 페이지 주소로 열어 주세요."
+      : "일정 파일(schedule.xlsx)을 불러오지 못했습니다. 잠시 뒤 새로고침해 주세요.");
+  }).then(function () {
+    view = startView();
+    $("foot").textContent = "일정은 운영 상황에 따라 바뀔 수 있습니다. 새로고침하면 최신 내용이 보입니다.";
+    render();
+    setInterval(render, 60000);
+  });
+})();
+</script>
+</body>
+</html>
