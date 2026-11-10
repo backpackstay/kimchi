@@ -31,10 +31,11 @@ body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--body)}
 .top{background:#1B1B1B;color:#FFFAEC;padding:calc(20px + env(safe-area-inset-top)) 0 18px}
 .eyebrow{font:600 11.5px var(--mono);letter-spacing:.08em;color:#FF8A57}
 h1{font:400 clamp(28px,8vw,42px)/1.1 var(--display);margin:6px 0 12px;letter-spacing:-.01em;word-break:keep-all}
-.facts{display:grid;gap:6px;margin:0;padding:0;list-style:none}
-.facts li{display:flex;gap:10px;font-size:14px;color:#D9D2C3}
-.facts b{flex:0 0 3.2em;color:#FF8A57;font-weight:500}
-.facts span{color:#FFFAEC;word-break:keep-all}
+/* 라벨 칸은 가장 긴 라벨(예: 비상연락망)에 맞춰 자동으로 넓어지고, 내용은 같은 줄에서 시작 */
+.facts{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 12px;margin:0;padding:0;list-style:none;font-size:14px}
+.facts li{display:contents}
+.facts b{color:#FF8A57;font-weight:500;white-space:nowrap}
+.facts span{color:#FFFAEC;word-break:keep-all;overflow-wrap:anywhere}
 
 /* 탭 */
 .bar{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
