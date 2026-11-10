@@ -78,10 +78,110 @@ main{padding:16px 0 calc(48px + env(safe-area-inset-bottom))}
 .empty{padding:36px 16px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
 footer{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 24px}
 [hidden]{display:none!important}
+
+/* 지도: 두 손가락 확대, 한 손가락 끌기, 두 번 탭 확대 */
+.map{position:relative;height:calc(100svh - 150px);min-height:360px;overflow:hidden;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+.map.drag{cursor:grabbing}
+.map img{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;-webkit-user-drag:none;will-change:transform;visibility:hidden}
+.map.ready img{visibility:visible}
+.map-ctl{position:absolute;right:10px;bottom:10px;display:flex;flex-direction:column;gap:6px}
+.map-ctl button{width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:700 20px/1 var(--body);box-shadow:0 2px 6px rgba(0,0,0,.15);cursor:pointer}
+.map-hint{position:absolute;left:50%;top:10px;transform:translateX(-50%);background:rgba(27,27,27,.75);color:#FFFAEC;font-size:12.5px;padding:5px 11px;border-radius:999px;white-space:nowrap;pointer-events:none;transition:opacity .4s}
+.map-hint.off{opacity:0}
+.map-err{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--muted);font-size:14px}
+.map-sub{margin:10px 2px 0;font-size:13px;color:var(--muted)}
+.map-sub a{color:var(--accent)}
+
+/* 인트로 (영상 파일 대신 페이지가 직접 그리는 애니메이션 — 휴대폰·카톡 브라우저에서도 동작) */
+#intro{position:fixed;inset:0;z-index:100;background:#1B1B1B;overflow:hidden;transition:opacity .7s ease .1s}
+#intro.end{background:#FF5F18}
+#intro.end #st{opacity:0;transition:opacity .15s}
+#intro.out{opacity:0;pointer-events:none}
+#st{position:absolute;left:50%;top:50%;width:1080px;height:1920px;margin:-960px 0 0 -540px;transform-origin:50% 50%}
+#st .glow{position:absolute;inset:0;opacity:0;background:radial-gradient(ellipse at center,rgba(255,95,24,.10),rgba(0,0,0,0) 55%)}
+#st .g{position:absolute;left:0;top:0;width:1080px;height:1920px;display:flex;flex-direction:column;align-items:center;justify-content:center;will-change:transform}
+#st .eb{font:600 40px var(--mono);letter-spacing:.3em;margin-right:-.3em;color:#FF8A57;opacity:0}
+#st .tt{font:400 232px/1.05 var(--display);color:#FFFAEC;margin:22px 0 30px;letter-spacing:-.01em;opacity:0;white-space:nowrap}
+#st .br{height:20px;width:0;background:#FF5F18;border-radius:2px}
+#st .sb{font:600 30px var(--mono);letter-spacing:.22em;margin:34px -.22em 0 0;color:#B8B0A2;opacity:0;white-space:nowrap}
+#st .ov{position:absolute;inset:0;background:#FF5F18;opacity:0}
+#skip{position:absolute;right:max(16px,env(safe-area-inset-right));bottom:calc(20px + env(safe-area-inset-bottom));border:1px solid rgba(255,250,236,.35);background:rgba(27,27,27,.4);color:#FFFAEC;border-radius:999px;padding:7px 14px;font:500 13px var(--body);cursor:pointer}
+html.intro-on{overflow:hidden}
+html.intro-on .top,html.intro-on .bar,html.intro-on main,html.intro-on footer{opacity:0;transform:scale(1.08)}
+html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-reveal footer{transition:opacity .8s ease,transform 1s cubic-bezier(.2,.7,.2,1);transform-origin:50% 0}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 </style>
 </head>
 <body>
+
+<!-- 인트로: 처음 들어왔을 때 한 번만 로고 연출(약 3초)을 보여주고, 줌인되며 공지 화면으로 넘어갑니다.
+     로고 글자를 바꾸려면 아래 eb(위 작은 글씨) · tt(큰 글씨) · sb(아래 작은 글씨) 안의 글자를 고치면 됩니다. -->
+<div id="intro" hidden>
+  <div id="st" aria-hidden="true">
+    <div class="glow"></div>
+    <div class="g"><div class="eb">BACKPACK STAY</div><div class="tt">김장대첩</div><div class="br"></div><div class="sb">2026 · KIMCHI ROAD TRAIL</div></div>
+    <div class="ov"></div>
+  </div>
+  <button id="skip" type="button">건너뛰기</button>
+</div>
+<script>
+(function () {
+  var html = document.documentElement, box = document.getElementById("intro"), st = document.getElementById("st");
+  var force = /[?&]intro\b/.test(location.search);
+  var seen = false, reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  try { seen = sessionStorage.getItem("kj-intro") === "1"; } catch (e) {}
+  if (!force && (seen || reduce || /[?&]nointro\b/.test(location.search))) { box.remove(); return; }
+  try { sessionStorage.setItem("kj-intro", "1"); } catch (e) {}
+  box.hidden = false; html.classList.add("intro-on");
+  var done = false;
+  var q = function (c) { return st.querySelector(c); };
+  var g = q(".g"), eb = q(".eb"), tt = q(".tt"), br = q(".br"), sb = q(".sb"), glow = q(".glow"), ov = q(".ov");
+  var cl = function (x, a, b) { return Math.min(1, Math.max(0, (x - a) / (b - a))); };
+  var eo = function (x) { return 1 - Math.pow(1 - x, 3); }, ei = function (x) { return x * x * x * x; };
+  function fit() { st.style.transform = "scale(" + Math.max(innerWidth / 1080, innerHeight / 1920) + ")"; }
+  fit(); addEventListener("resize", fit);
+  function frame(t) {
+    var a = eo(cl(t, 0, .6)), b = eo(cl(t, .3, 1)), s = eo(cl(t, .5, 1.1)), f = 1 - cl(t, 2, 2.35);
+    tt.style.opacity = a; tt.style.transform = "translateY(" + (1 - a) * 24 + "px)";
+    eb.style.opacity = cl(t, .15, .7) * f; sb.style.opacity = s * f;
+    br.style.width = 440 * b + "px";
+    glow.style.opacity = cl(t, .4, 1.4);
+    var sc = (1 + .05 * cl(t, .6, 2)) * (1 + ei(cl(t, 2, 2.8)) * 110);
+    g.style.transform = "scale(" + sc + ")";
+    ov.style.opacity = cl(t, 2.55, 2.8);
+  }
+  function run() {
+    if (done) return;
+    br.style.width = "440px";
+    g.style.transformOrigin = "540px " + (br.offsetTop + br.offsetHeight / 2) + "px";
+    var t0 = null;
+    (function tick(now) {
+      if (done) return;
+      if (t0 === null) t0 = now;
+      var t = (now - t0) / 1000;
+      frame(t);
+      if (t >= 2.85) reveal(); else requestAnimationFrame(tick);
+    })(performance.now());
+  }
+  /* 글꼴이 준비되면 시작 (늦어도 1.2초 안에 시작) */
+  var started = false;
+  function go() { if (!started) { started = true; requestAnimationFrame(run); } }
+  try { Promise.all([document.fonts.load('400 232px "Black Han Sans"', "김장대첩"), document.fonts.load('600 40px "IBM Plex Mono"', "BACKPACK")]).then(go, go); } catch (e) { go(); }
+  setTimeout(go, 1200);
+  function reveal() {
+    if (done) return; done = true;
+    box.classList.add("end");
+    html.classList.add("intro-reveal");
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      html.classList.remove("intro-on");
+      box.classList.add("out");
+      setTimeout(function () { box.remove(); html.classList.remove("intro-reveal"); }, 1100);
+    }); });
+  }
+  document.getElementById("skip").addEventListener("click", reveal);
+  setTimeout(reveal, 7000); /* 어떤 이유로 멈춰도 7초 뒤엔 화면을 보여줌 */
+})();
+</script>
 
 <header class="top">
   <div class="wrap">
@@ -108,7 +208,7 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 24px}
 
   /* schedule.xlsx를 못 읽을 때(예: PC에서 파일을 더블클릭해 열었을 때) 보여줄 예비 데이터 */
   var FALLBACK = {
-    info: [["행사명","2026 백패커 김장대첩"],["부제","SANTASY SERIES · 김치로드트레일"],["날짜","2026. 11. 28.(토) ~ 11. 29.(일) 1박 2일"],["장소","샘플 오토캠핑장"],["1일차 날짜","2026-11-28"],["2일차 날짜","2026-11-29"]],
+    info: [["행사명","2026 백패커 김장대첩"],["부제","BACKPACK STAY · 김치로드트레일"],["날짜","2026. 11. 28.(토) ~ 11. 29.(일) 1박 2일"],["장소","샘플 오토캠핑장"],["1일차 날짜","2026-11-28"],["2일차 날짜","2026-11-29"]],
     items: [{day:1,start:"10:30",end:"11:00",session:"오프닝",title:"집결 · 체크인",place:"관리동 앞",desc:"예비 데이터입니다. GitHub에 올리면 schedule.xlsx 내용이 보입니다."}],
     notes: []
   };
@@ -188,7 +288,7 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 24px}
     var tabs = [{ v: "notice", t: "공지", s: D.notes.length ? D.notes.length + "건" : "" }].concat(days.map(function (d) {
       var ds = dayDate(d), p = ds ? ds.split("-") : null;
       return { v: "d" + d, t: d + "일차", s: p ? (+p[1]) + "/" + (+p[2]) : "" };
-    }));
+    })).concat([{ v: "map", t: "지도", s: "행사장" }]);
     if (!tabs.some(function (x) { return x.v === view; })) view = "notice";
     $("tabs").innerHTML = tabs.map(function (x) {
       return '<button class="tab" role="tab" type="button" data-v="' + x.v + '" aria-selected="' + (x.v === view) + '">' + esc(x.t) + (x.s ? "<small>" + esc(x.s) + "</small>" : "") + "</button>";
@@ -217,6 +317,11 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 24px}
   function render() {
     renderHead(); renderTabs();
     var html = "";
+    if (view === "map") {
+      $("view").innerHTML = mapHtml();
+      setupMap();
+      return;
+    }
     if (view === "notice") {
       html += nowBanner();
       html += D.notes.length ? '<div class="notes">' + D.notes.map(noteHtml).join("") + "</div>" : '<div class="empty">아직 공지가 없습니다.</div>';
@@ -231,6 +336,125 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 24px}
     if (cur && view !== "notice" && !render.scrolled) { render.scrolled = true; cur.scrollIntoView({ block: "center" }); }
   }
 
+  /* ── 지도 ──────────────────────────────────────────
+     지도 그림을 바꾸려면 같은 이름(김장대첩지도.PNG)으로 덮어 올리면 됩니다.
+     파일 이름이 다르면 아래 MAP_SRC 글자만 바꾸세요. (대소문자까지 똑같아야 합니다) */
+  var MAP_SRC = "김장대첩지도.PNG";
+
+  function mapHtml() {
+    var src = encodeURI(MAP_SRC);
+    return '<div class="map" id="map">' +
+      '<img id="mapimg" src="' + src + '?v=1" alt="김장대첩 행사장 지도" draggable="false">' +
+      '<div class="map-hint" id="maphint">두 손가락으로 확대 · 끌어서 이동</div>' +
+      '<div class="map-ctl"><button type="button" data-z="in" aria-label="확대">+</button>' +
+      '<button type="button" data-z="out" aria-label="축소">−</button>' +
+      '<button type="button" data-z="fit" aria-label="전체 보기">⤢</button></div></div>' +
+      '<p class="map-sub">잘 안 보이면 <a href="' + src + '" target="_blank" rel="noopener">지도 원본 이미지 열기</a></p>';
+  }
+
+  function setupMap() {
+    var box = $("map"), img = $("mapimg"), hint = $("maphint");
+    var W = 0, H = 0, iw = 0, ih = 0, minS = 1, maxS = 4, s = 1, x = 0, y = 0;
+    var pts = {}, last = null, lastTap = 0;
+
+    function size() { W = box.clientWidth; H = box.clientHeight; }
+    function clamp() {
+      s = Math.min(maxS, Math.max(minS, s));
+      var w = iw * s, h = ih * s;
+      x = w <= W ? (W - w) / 2 : Math.min(0, Math.max(W - w, x));
+      y = h <= H ? (H - h) / 2 : Math.min(0, Math.max(H - h, y));
+    }
+    function draw(anim) {
+      clamp();
+      img.style.transition = anim ? "transform .25s ease" : "none";
+      img.style.transform = "translate(" + x + "px," + y + "px) scale(" + s + ")";
+    }
+    /* (cx, cy) 지점을 기준으로 배율 바꾸기 */
+    function zoomAt(ns, cx, cy, anim) {
+      ns = Math.min(maxS, Math.max(minS, ns));
+      x = cx - (cx - x) * ns / s; y = cy - (cy - y) * ns / s; s = ns; draw(anim);
+    }
+    /* 처음 화면: 세로를 꽉 채워서 좌우로 밀어 볼 수 있게 (가로가 긴 지도 기준) */
+    function start() {
+      size(); iw = img.naturalWidth; ih = img.naturalHeight;
+      minS = Math.min(W / iw, H / ih);                 // 전체가 한눈에 보이는 배율
+      var cover = Math.max(W / iw, H / ih);            // 화면을 꽉 채우는 배율
+      maxS = Math.max(cover * 4, 2);
+      s = cover; x = (W - iw * s) / 2; y = (H - ih * s) / 2;
+      draw(false); box.classList.add("ready");
+    }
+    function fitToggle() {
+      var cover = Math.max(W / iw, H / ih);
+      var ns = s > minS * 1.01 ? minS : cover;
+      zoomAt(ns, W / 2, H / 2, true);
+    }
+
+    if (img.complete && img.naturalWidth) start(); else img.addEventListener("load", start);
+    img.addEventListener("error", function () {
+      box.innerHTML = '<div class="map-err">지도 이미지(' + esc(MAP_SRC) + ')를 찾을 수 없습니다.<br>저장소에 같은 이름으로 올라가 있는지 확인해 주세요.</div>';
+    });
+    setTimeout(function () { hint && hint.classList.add("off"); }, 3500);
+
+    function rel(e) { var r = box.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+    function pair() {
+      var k = Object.keys(pts); if (k.length < 2) return null;
+      var a = pts[k[0]], b = pts[k[1]];
+      return { cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2, d: Math.hypot(a.x - b.x, a.y - b.y) };
+    }
+
+    box.addEventListener("pointerdown", function (e) {
+      if (e.target.closest(".map-ctl") || !iw) return;
+      box.setPointerCapture(e.pointerId);
+      pts[e.pointerId] = rel(e); last = pair() || pts[e.pointerId];
+      box.classList.add("drag"); hint && hint.classList.add("off");
+      /* 두 번 탭: 그 자리 확대 / 이미 크게 보고 있으면 전체 보기 */
+      if (Object.keys(pts).length === 1) {
+        var now = Date.now(), p = pts[e.pointerId];
+        if (now - lastTap < 300) { zoomAt(s < minS * 2.2 ? s * 2.2 : minS, p.x, p.y, true); lastTap = 0; }
+        else lastTap = now;
+      }
+    });
+    box.addEventListener("pointermove", function (e) {
+      if (!pts[e.pointerId]) return;
+      pts[e.pointerId] = rel(e);
+      var p = pair();
+      if (p && last && last.d) {             // 두 손가락: 확대/축소 + 이동
+        var ns = Math.min(maxS, Math.max(minS, s * p.d / last.d));
+        x = p.cx - (last.cx - x) * ns / s; y = p.cy - (last.cy - y) * ns / s; s = ns;
+        draw(false); last = p;
+      } else if (!p && last) {              // 한 손가락: 끌어서 이동
+        var c = pts[e.pointerId];
+        x += c.x - last.x; y += c.y - last.y; draw(false); last = c;
+      }
+    });
+    function up(e) {
+      delete pts[e.pointerId];
+      var k = Object.keys(pts);
+      last = k.length ? pts[k[0]] : null;
+      if (!k.length) box.classList.remove("drag");
+    }
+    box.addEventListener("pointerup", up);
+    box.addEventListener("pointercancel", up);
+
+    /* PC: 마우스 휠로 확대 */
+    box.addEventListener("wheel", function (e) {
+      if (!iw) return; e.preventDefault();
+      var p = rel(e); zoomAt(s * (e.deltaY < 0 ? 1.15 : 1 / 1.15), p.x, p.y, false);
+    }, { passive: false });
+
+    box.querySelector(".map-ctl").addEventListener("click", function (e) {
+      var b = e.target.closest("button"); if (!b || !iw) return;
+      var z = b.dataset.z;
+      if (z === "in") zoomAt(s * 1.6, W / 2, H / 2, true);
+      else if (z === "out") zoomAt(s / 1.6, W / 2, H / 2, true);
+      else fitToggle();
+    });
+
+    /* 화면 회전·크기 변경 시 다시 맞추기 */
+    function onResize() { if (!document.body.contains(box)) { removeEventListener("resize", onResize); return; } if (iw) start(); }
+    addEventListener("resize", onResize);
+  }
+
   $("tabs").addEventListener("click", function (e) {
     var b = e.target.closest(".tab"); if (!b) return;
     view = b.dataset.v; try { history.replaceState(null, "", "#" + view); } catch (x) {}
@@ -239,7 +463,7 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 24px}
 
   function startView() {
     var h = location.hash.slice(1);
-    if (/^(notice|d1|d2)$/.test(h)) return h;
+    if (/^(notice|d1|d2|map)$/.test(h)) return h;
     var td = today();
     if (dayDate(1) === td) return "d1";
     if (dayDate(2) === td) return "d2";
@@ -264,7 +488,7 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 24px}
     view = startView();
     $("foot").textContent = "일정은 운영 상황에 따라 바뀔 수 있습니다. 새로고침하면 최신 내용이 보입니다.";
     render();
-    setInterval(render, 60000);
+    setInterval(function () { if (view !== "map") render(); }, 60000); /* 지도 보는 중엔 확대 상태 유지 */
   });
 })();
 </script>
