@@ -339,7 +339,8 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
   /* ── 지도 ──────────────────────────────────────────
      지도 그림을 바꾸려면 같은 이름(김장대첩지도.PNG)으로 덮어 올리면 됩니다.
      파일 이름이 다르면 아래 MAP_SRC 글자만 바꾸세요. (대소문자까지 똑같아야 합니다) */
-  var MAP_SRC = "김장대첩지도.PNG";
+  var MAP_SRC = "김장대첩지도.png";
+  var MAP_ALT = "김장대첩지도.PNG"; /* 위 이름으로 못 찾으면 이 이름으로 한 번 더 찾아봄 */
 
   function mapHtml() {
     var src = encodeURI(MAP_SRC);
@@ -390,7 +391,9 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
     }
 
     if (img.complete && img.naturalWidth) start(); else img.addEventListener("load", start);
+    var triedAlt = false;
     img.addEventListener("error", function () {
+      if (!triedAlt && MAP_ALT) { triedAlt = true; img.src = encodeURI(MAP_ALT) + "?v=1"; return; }
       box.innerHTML = '<div class="map-err">지도 이미지(' + esc(MAP_SRC) + ')를 찾을 수 없습니다.<br>저장소에 같은 이름으로 올라가 있는지 확인해 주세요.</div>';
     });
     setTimeout(function () { hint && hint.classList.add("off"); }, 3500);
