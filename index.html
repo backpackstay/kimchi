@@ -591,11 +591,10 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
     appOpen = e.target.open; try { localStorage.setItem("kj-appnote-closed", appOpen ? "0" : "1"); } catch (x) {}
   }, true);
 
+  /* 처음 열면(새로고침 포함) 행사 당일이어도 항상 공지 탭부터 보여 줍니다 */
   function startView() {
-    var h = location.hash.slice(1);
-    if (/^(notice|d1|d2|map)$/.test(h)) return h;
-    var tday = todayDay();
-    return tday ? "d" + tday : "notice";
+    try { history.replaceState(null, "", location.pathname + location.search); } catch (x) {}
+    return "notice";
   }
 
   function showMsg(t) { $("msg").textContent = t; $("msg").hidden = !t; }
