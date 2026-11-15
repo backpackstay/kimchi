@@ -278,7 +278,14 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
   }
 
   function dayDate(d) { return toDate(D.info[d + "일차 날짜"]); }
-  function today() { var n = new Date(); return n.getFullYear() + "-" + pad(n.getMonth() + 1) + "-" + pad(n.getDate()); }
+  /* 하이라이트 추가 기간: 이 기간에는 날짜가 행사일이 아니어도 아래 'day' 일차 시간표대로
+     지금 진행 중인 프로그램을 표시합니다. (일차 날짜 표시는 11/28 · 11/29 그대로, '오늘' 표시는 안 붙음)
+     기간을 바꾸려면 from · to 날짜만 고치고, 필요 없으면 from 을 "" 로 두세요. */
+  var HIGHLIGHT_EXTRA = { from: "2026-11-15", to: "2026-11-25", day: 1 };
+  function realToday() { var n = new Date(); return n.getFullYear() + "-" + pad(n.getMonth() + 1) + "-" + pad(n.getDate()); }
+  function inExtra() { var t = realToday(); return !!HIGHLIGHT_EXTRA.from && t >= HIGHLIGHT_EXTRA.from && t <= HIGHLIGHT_EXTRA.to; }
+  /* 하이라이트 계산에 쓰는 '오늘' (추가 기간이면 해당 일차 날짜로 봄) */
+  function today() { return inExtra() ? dayDate(HIGHLIGHT_EXTRA.day) : realToday(); }
   function dayLabel(d) {
     var ds = dayDate(d); if (!ds) return d + "일차";
     var p = ds.split("-"), w = "일월화수목금토"[new Date(+p[0], +p[1] - 1, +p[2]).getDay()];
@@ -325,7 +332,7 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
     if (!tabs.some(function (x) { return x.v === view; })) view = "notice";
     var tday = todayDay();
     $("tabs").innerHTML = tabs.map(function (x) {
-      var isToday = tday && x.v === "d" + tday;
+      var isToday = tday && x.v === "d" + tday && !inExtra();
       return '<button class="tab' + (isToday ? " today" : "") + '" role="tab" type="button" data-v="' + x.v + '" aria-selected="' + (x.v === view) + '">' + esc(x.t) +
         (isToday ? "<small>오늘</small>" : x.s ? "<small>" + esc(x.s) + "</small>" : "") + "</button>";
     }).join("");
@@ -366,7 +373,7 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
       var d = +view.slice(1), list = D.items.filter(function (i) { return i.day === d; }), nx = nextItem();
       var isToday = todayDay() === d;
       if (isToday) html += nowBanner();
-      html += '<h2 class="sec-h">' + esc(dayLabel(d)) + (isToday ? '<span class="today-tag">오늘</span>' : "") + "</h2>";
+      html += '<h2 class="sec-h">' + esc(dayLabel(d)) + (isToday && !inExtra() ? '<span class="today-tag">오늘</span>' : "") + "</h2>";
       html += '<ol class="tl">' + list.map(function (i) { return itemHtml(i, nx); }).join("") + "</ol>";
     }
     $("view").innerHTML = html;
