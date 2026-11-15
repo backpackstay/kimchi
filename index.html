@@ -143,6 +143,7 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 24px}
 .map-pop .pimg .ph .dot{width:56px;height:56px}
 .map-pop .pcap{display:flex;align-items:flex-start;gap:9px;padding:12px 14px 6px;font-size:16px;font-weight:700;line-height:1.4;word-break:keep-all;overflow-wrap:anywhere}
 .map-pop .pcap .emo,.map-pop .pcap .dot{margin-top:3px}
+.map-pop .pdesc{margin:0;padding:0 14px 8px 14px;font-size:14px;line-height:1.5;color:var(--ink);word-break:keep-all;overflow-wrap:anywhere}
 .map-pop .pclose{padding:0 14px 12px;font-size:12px;color:var(--muted)}
 .map-pop .dot{width:14px;height:14px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
 @keyframes mappop{from{opacity:0;transform:translate(-50%,-47%) scale(.97)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
@@ -502,14 +503,14 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
     { c: "#8E4EC6", n: "보라색", m: "발목에 걸리는건 죄가 아니잖아!", img: "mission_purple.jpg" },
     { c: "#F2C81E", n: "노란색", m: "네땅도 내땅, 내땅도 내땅", img: "mission_yellow.jpg" }
   ];
-  /* 특별 리워드 줄: e 는 이모티콘, m 은 누르면 팝업에 뜨는 미션 이름. 무는 휴대폰에 이모티콘이 없어 그림(MU_SVG)으로 넣었습니다 */
+  /* 특별 리워드 줄: e 는 이모티콘, m 은 누르면 팝업에 뜨는 미션 이름. 무는 휴대폰에 이모티콘이 없어 그림(MU_SVG)으로 넣었습니다, d 는 미션 이름 아래 설명(없으면 안 보임) */
   var MU_SVG = '<svg class="svgemo" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7.500C10 4.500 7 3.500 5 4.500c1 2.200 3.200 3.800 6.500 3.600zM11.800 7.500c-.3-3 .9-5.300 3-6.300 1 2.200 0 5-2.200 6.800zM12.500 7.800c2-2.200 5-3 7-2-1.200 2.200-4 3.600-7 2.800z" fill="#4CAF50"/><path d="M8 8.800c2-1.500 6-1.500 8 0 1.500 2 .5 6.800-1.500 10.200-1 1.800-1.900 3.500-2.500 3.500s-1.500-1.700-2.500-3.500C7.500 15.600 6.500 10.800 8 8.800z" fill="#FFFDF5" stroke="#A9A38F" stroke-width="1"/></svg>';
   var MAP_SPECIAL = [
     { e: "🌶️", n: "고추", m: '힐록에 가서 "사장님 김치추가" 주문해 보세요. 숨은미션이 나올지도~', img: "mission_pepper.jpg" },
     { e: "🫚", n: "생강", m: "생강 헤는 밤", img: "mission_ginger.jpg" },
     { h: MU_SVG, n: "무", m: "쇼미 더 김치", img: "mission_radish.jpg" },
     { e: "🧅", n: "양파", m: "너의 목소리가 보여", img: "mission_onion.jpg" },
-    { e: "🥬", n: "배추", m: "김치맨을 찾아라!", img: "mission_cabbage.jpg" }
+    { e: "🥬", n: "배추", m: "김치맨을 찾아라!", d: "무주시내를 누비는 김치맨을 찾으신다면 당신은 행운아!", img: "mission_cabbage.jpg" }
   ];
   function emoHtml(s) { return '<span class="emo">' + (s.h || esc(s.e)) + "</span>"; }
   var MAP_LEGEND_TIP ="*이모티콘을 눌러보세요.";
@@ -558,6 +559,7 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
     }
     p.innerHTML = '<div class="pimg"><div class="ph"><span class="big">' + icon + "</span>미션 이미지 준비 중</div>" + img + "</div>" +
       '<div class="pcap">' + icon + "<span>" + esc(l.m) + "</span></div>" +
+      (l.d ? '<p class="pdesc">' + esc(l.d) + "</p>" : "") +
       '<div class="pclose">화면 아무 곳이나 누르면 닫혀요</div>';
     p.hidden = false; var bg = $("mappopbg"); if (bg) bg.hidden = false;
   });
