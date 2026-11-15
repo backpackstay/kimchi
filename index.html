@@ -10,18 +10,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
 <style>
+/* 바탕은 휴대폰 설정(라이트/다크 모드)과 상관없이 항상 블랙 톤으로 고정 */
 :root{
-  --bg:#FFFAEC; --surface:#FFFFFF; --surface-2:#F6F0E2; --ink:#1B1B1B; --muted:#6B6458; --line:#E6DECD;
-  --accent:#FF5F18; --accent-soft:#FFE6D9; --pin:#FFF0C2;
+  --bg:#151412; --surface:#1F1D1A; --surface-2:#2A2724; --ink:#F4F0E8; --muted:#A9A196; --line:#39352F;
+  --accent:#FF7A3D; --accent-soft:#3A2418; --pin:#382E14;
   --display:"Black Han Sans","IBM Plex Sans KR","Malgun Gothic",sans-serif;
   --body:"IBM Plex Sans KR","Pretendard","Malgun Gothic",-apple-system,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
-  color-scheme:light;
+  color-scheme:dark;
 }
-@media (prefers-color-scheme:dark){:root{
-  --bg:#151412; --surface:#1F1D1A; --surface-2:#2A2724; --ink:#F4F0E8; --muted:#A9A196; --line:#39352F;
-  --accent:#FF7A3D; --accent-soft:#3A2418; --pin:#382E14; color-scheme:dark;
-}}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 var(--body)}
@@ -65,11 +62,31 @@ main{padding:16px 0 calc(48px + env(safe-area-inset-bottom))}
 .it{display:grid;grid-template-columns:44px 1fr;gap:16px;padding:8px 0;position:relative}
 .it::before{content:"";position:absolute;left:48px;top:17px;width:10px;height:10px;border-radius:50%;background:var(--bg);border:2px solid var(--muted)}
 .it.cur::before{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
-.it.past{opacity:.55}
+.it.past{opacity:.45}
 .t{font:600 14px var(--mono);font-variant-numeric:tabular-nums;padding-top:9px;text-align:right}
 .t small{display:block;font-size:11.5px;color:var(--muted);font-weight:500}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px 10px 14px;margin-left:8px;min-width:0}
-.it.cur .card{border-color:var(--accent)}
+/* ── 지금 시간 하이라이트 ── */
+/* 지금 진행 중인 프로그램: 굵은 주황 테두리 + 연한 주황 바탕 + 은은하게 깜빡이는 빛 */
+.it.cur .card{border:2.5px solid var(--accent);background:var(--accent-soft);padding:9px 11px 9px 13px;animation:nowglow 2.2s ease-in-out infinite}
+.it.cur .t{color:var(--accent)}
+.it.cur::before{width:14px;height:14px;left:46px;top:15px;animation:nowdot 1.4s ease-in-out infinite}
+@keyframes nowglow{0%,100%{box-shadow:0 0 0 0 rgba(255,95,24,.35)}50%{box-shadow:0 0 0 7px rgba(255,95,24,0)}}
+@keyframes nowdot{0%,100%{box-shadow:0 0 0 3px var(--accent-soft)}50%{box-shadow:0 0 0 8px rgba(255,95,24,.12)}}
+/* 프로그램 사이 쉬는 시간: 다음 프로그램을 점선 테두리로 */
+.it.next .card{border:2px dashed var(--accent)}
+.it.next::before{border-color:var(--accent)}
+.live{display:inline-flex;align-items:center;gap:5px;font:700 11.5px var(--body);color:#fff;background:var(--accent);border-radius:999px;padding:1px 9px 1px 7px;margin:0 0 4px 4px;vertical-align:1px}
+.live::before{content:"";width:6px;height:6px;border-radius:50%;background:#fff;animation:blink 1.4s ease-in-out infinite}
+.live.soon{background:none;color:var(--accent);border:1.5px solid var(--accent)}
+.live.soon::before{background:var(--accent);animation:none}
+@keyframes blink{50%{opacity:.25}}
+/* 오늘에 해당하는 일차 탭 · 제목 */
+.tab.today{color:var(--accent)}
+.tab.today small{display:inline-block;margin-top:2px;color:#fff;background:var(--accent);border-radius:999px;padding:0 8px;font-family:var(--body);font-weight:700}
+.tab.today[aria-selected=true]{color:var(--ink)}
+.sec-h .today-tag{display:inline-block;margin-left:8px;font:700 12px var(--body);color:#fff;background:var(--accent);border-radius:999px;padding:2px 9px;vertical-align:4px}
+@media (prefers-reduced-motion:reduce){.it.cur .card,.it.cur::before,.live::before{animation:none}}
 .chip{display:inline-block;font-size:11.5px;font-weight:500;border-radius:999px;padding:0 8px;background:var(--surface-2);color:var(--muted);margin-bottom:3px}
 .card h3{margin:0;font-size:16px;line-height:1.35;word-break:keep-all}
 .place{font-size:13px;color:var(--muted);margin-top:2px}
@@ -267,13 +284,28 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
     var p = ds.split("-"), w = "일월화수목금토"[new Date(+p[0], +p[1] - 1, +p[2]).getDay()];
     return d + "일차 · " + (+p[1]) + "/" + (+p[2]) + "(" + w + ")";
   }
+  /* 지금 진행 중(cur) / 지난 일정(past) / 아직 안 함("").
+     종료 시간이 시작보다 이르면(예: 21:00~07:00) 다음 날 아침까지 진행 중으로 봅니다. */
+  function addDay(ds) { var p = ds.split("-"), d = new Date(+p[0], +p[1] - 1, +p[2] + 1); return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate()); }
   function state(i) {
     var ds = dayDate(i.day), td = today(); if (!ds) return "";
-    if (ds < td) return "past"; if (ds > td) return "";
     var n = new Date(), now = n.getHours() * 60 + n.getMinutes(), s = mins(i.start), e = mins(i.end);
-    if (s == null) return "";
+    if (s == null) return ds < td ? "past" : "";
     if (e == null) e = s + 30;
-    return now >= e ? "past" : now >= s ? "cur" : "";
+    var over = e <= s;
+    if (ds === td) return over ? (now >= s ? "cur" : "") : (now >= e ? "past" : now >= s ? "cur" : "");
+    if (ds < td) return (over && addDay(ds) === td && now < e) ? "cur" : "past";
+    return "";
+  }
+  /* 지금 진행 중인 게 없을 때(쉬는 시간) 오늘 바로 다음에 시작할 프로그램 */
+  function nextItem() {
+    if (D.items.some(function (i) { return state(i) === "cur"; })) return null;
+    return D.items.filter(function (i) { return dayDate(i.day) === today() && state(i) === ""; })[0] || null;
+  }
+  /* 오늘이 몇 일차인지 (야영처럼 자정을 넘긴 일정이 진행 중이면 그 일차) */
+  function todayDay() {
+    var c = D.items.filter(function (i) { return state(i) === "cur"; })[0]; if (c) return c.day;
+    return dayDate(1) === today() ? 1 : dayDate(2) === today() ? 2 : 0;
   }
 
   function renderHead() {
@@ -291,8 +323,11 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
       return { v: "d" + d, t: d + "일차", s: p ? (+p[1]) + "/" + (+p[2]) : "" };
     })).concat([{ v: "map", t: "지도", s: "행사장" }]);
     if (!tabs.some(function (x) { return x.v === view; })) view = "notice";
+    var tday = todayDay();
     $("tabs").innerHTML = tabs.map(function (x) {
-      return '<button class="tab" role="tab" type="button" data-v="' + x.v + '" aria-selected="' + (x.v === view) + '">' + esc(x.t) + (x.s ? "<small>" + esc(x.s) + "</small>" : "") + "</button>";
+      var isToday = tday && x.v === "d" + tday;
+      return '<button class="tab' + (isToday ? " today" : "") + '" role="tab" type="button" data-v="' + x.v + '" aria-selected="' + (x.v === view) + '">' + esc(x.t) +
+        (isToday ? "<small>오늘</small>" : x.s ? "<small>" + esc(x.s) + "</small>" : "") + "</button>";
     }).join("");
   }
 
@@ -300,10 +335,11 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
     return '<article class="note' + (n.pin ? " pin" : "") + '"><h3>' + (n.pin ? '<span class="tag">중요</span>' : "") + esc(n.title) +
       (n.date ? '<span class="d">' + esc(n.date) + "</span>" : "") + "</h3><p>" + esc(n.body) + "</p></article>";
   }
-  function itemHtml(i) {
-    var st = state(i);
-    return '<li class="it ' + st + '"><div class="t">' + esc(i.start) + (i.end ? "<small>~" + esc(i.end) + "</small>" : "") + "</div>" +
-      '<div class="card">' + (i.session ? '<span class="chip">' + esc(i.session) + "</span>" : "") + "<h3>" + esc(i.title) + "</h3>" +
+  function itemHtml(i, nx) {
+    var st = state(i), isNext = nx === i;
+    var badge = st === "cur" ? '<span class="live">지금 진행 중</span>' : isNext ? '<span class="live soon">다음 일정</span>' : "";
+    return '<li class="it ' + st + (isNext ? " next" : "") + '"><div class="t">' + esc(i.start) + (i.end ? "<small>~" + esc(i.end) + "</small>" : "") + "</div>" +
+      '<div class="card">' + (i.session ? '<span class="chip">' + esc(i.session) + "</span>" : "") + badge + "<h3>" + esc(i.title) + "</h3>" +
       (i.place ? '<div class="place">📍 ' + esc(i.place) + "</div>" : "") + (i.desc ? '<p class="desc">' + esc(i.desc) + "</p>" : "") + "</div></li>";
   }
 
@@ -327,13 +363,14 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
       html += nowBanner();
       html += D.notes.length ? '<div class="notes">' + D.notes.map(noteHtml).join("") + "</div>" : '<div class="empty">아직 공지가 없습니다.</div>';
     } else {
-      var d = +view.slice(1), list = D.items.filter(function (i) { return i.day === d; });
-      if (dayDate(d) === today()) html += nowBanner();
-      html += '<h2 class="sec-h">' + esc(dayLabel(d)) + "</h2>";
-      html += '<ol class="tl">' + list.map(itemHtml).join("") + "</ol>";
+      var d = +view.slice(1), list = D.items.filter(function (i) { return i.day === d; }), nx = nextItem();
+      var isToday = todayDay() === d;
+      if (isToday) html += nowBanner();
+      html += '<h2 class="sec-h">' + esc(dayLabel(d)) + (isToday ? '<span class="today-tag">오늘</span>' : "") + "</h2>";
+      html += '<ol class="tl">' + list.map(function (i) { return itemHtml(i, nx); }).join("") + "</ol>";
     }
     $("view").innerHTML = html;
-    var cur = document.querySelector(".it.cur");
+    var cur = document.querySelector(".it.cur") || document.querySelector(".it.next");
     if (cur && view !== "notice" && !render.scrolled) { render.scrolled = true; cur.scrollIntoView({ block: "center" }); }
   }
 
@@ -468,10 +505,8 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
   function startView() {
     var h = location.hash.slice(1);
     if (/^(notice|d1|d2|map)$/.test(h)) return h;
-    var td = today();
-    if (dayDate(1) === td) return "d1";
-    if (dayDate(2) === td) return "d2";
-    return "notice";
+    var tday = todayDay();
+    return tday ? "d" + tday : "notice";
   }
 
   function showMsg(t) { $("msg").textContent = t; $("msg").hidden = !t; }
