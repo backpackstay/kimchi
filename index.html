@@ -159,6 +159,9 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 24px}
 #iv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;background:#1B1B1B} /* 화면을 꽉 채움 (검은 여백 없음). 화면 비율에 맞는 영상 파일은 아래 스크립트가 고름 */
 #iv.fit{object-fit:contain}
 #intro.vid #st{display:none}
+#intro.tap #st,#intro.wait #st{display:none}
+#tap{display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:0;background:#FF5F18;color:#fff;border-radius:999px;padding:14px 28px;font:700 17px var(--body);cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+#intro.tap #tap{display:block}
 #snd{display:none;position:absolute;left:max(16px,env(safe-area-inset-left));bottom:calc(20px + env(safe-area-inset-bottom));border:1px solid rgba(255,250,236,.35);background:rgba(27,27,27,.4);color:#FFFAEC;border-radius:999px;padding:7px 14px;font:500 13px var(--body);cursor:pointer}
 #intro.vid #snd{display:block}
 #intro.vid #snd.on{display:none}#st{position:absolute;left:50%;top:50%;width:1080px;height:1920px;margin:-960px 0 0 -540px;transform-origin:50% 50%}
@@ -213,6 +216,7 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
     <div class="g"><div class="eb">BACKPACK STAY</div><div class="tt">김장대첩</div><div class="br"></div><div class="sb">2026 · KIMCHI ROAD TRAIL</div></div>
     <div class="ov"></div>
   </div>
+  <button id="tap" type="button">▶ 인트로 보기</button>
   <button id="snd" type="button">🔊 소리 켜기</button>
   <button id="skip" type="button">건너뛰기</button>
 </div>
@@ -263,6 +267,7 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
   var iv = document.getElementById("iv"), mode = "wait", safety;
   function anim() {
     if (mode !== "wait") return; mode = "anim";
+    box.classList.remove("wait", "tap");
     if (iv) { try { iv.pause(); } catch (e) {} iv.remove(); iv = null; }
     try { Promise.all([document.fonts.load('400 232px "Black Han Sans"', "김장대첩"), document.fonts.load('600 40px "IBM Plex Mono"', "BACKPACK")]).then(go, go); } catch (e) { go(); }
     setTimeout(go, 1200);
@@ -283,12 +288,31 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
        - 정사각형에 가까운 화면(폴드 안쪽 화면 · 태블릿): intro_wide.mp4 (양옆을 흐린 배경으로 채운 넓은 영상)
        두 파일 모두 화면을 꽉 채우고(cover), 가로가 아주 긴 PC 화면에서만 영상 전체가 보이게(contain) 둡니다. */
     var ar = innerWidth / Math.max(1, innerHeight);
-    iv.src = (ar > 0.74 ? "intro_wide.mp4" : "intro.mp4") + "?v=20261127";
+    var wide = ar > 0.74;
+    /* 영상 첫 장면을 먼저 깔아 둠 (영상이 늦게 와도 빈 화면 대신 첫 장면이 보임) */
+    iv.poster = (wide ? "intro_wide_poster.jpg" : "intro_poster.jpg") + "?v=20261127";
+    iv.src = (wide ? "intro_wide.mp4" : "intro.mp4") + "?v=20261127";
     if (ar > 1.35) iv.classList.add("fit");
-    iv.hidden = false;
-    try { var p = iv.play(); if (p && p.catch) p.catch(anim); } catch (e) { anim(); }
-    setTimeout(anim, 3500);
+    iv.hidden = false; box.classList.add("wait");
+    /* 자동재생이 막히면(아이폰 저전력 모드 · 데이터 절약 · 일부 앱 안 브라우저) 첫 장면 위에 '▶ 인트로 보기' 버튼을 띄움 */
+    try { var p = iv.play(); if (p && p.catch) p.catch(tapMode); } catch (e) { tapMode(); }
+    /* 3.5초 안에 재생이 안 되면: 영상은 받았는데 멈춰 있으면 버튼, 아직 받는 중이면 4.5초 더 기다린 뒤 버튼 */
+    setTimeout(function () {
+      if (mode !== "wait") return;
+      if (iv && iv.readyState >= 2) tapMode();
+      else setTimeout(tapMode, 4500);
+    }, 3500);
   } else anim();
+  function tapMode() {
+    if (mode !== "wait" || !iv) return; mode = "tap";
+    box.classList.remove("wait"); box.classList.add("tap");
+  }
+  document.getElementById("tap").addEventListener("click", function () {
+    if (!iv) return;
+    box.classList.remove("tap"); mode = "wait";
+    iv.muted = false; iv.volume = 1; document.getElementById("snd").classList.add("on"); /* 눌러서 재생하면 소리도 같이 켬 */
+    try { var p = iv.play(); if (p && p.catch) p.catch(function () { iv.muted = true; var p2 = iv.play(); if (p2 && p2.catch) p2.catch(anim); }); } catch (e) { anim(); }
+  });
   function reveal() {
     if (done) return; done = true;
     box.classList.add("end");
