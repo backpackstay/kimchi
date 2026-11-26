@@ -553,18 +553,11 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
   function mapHtml() {
     var src = encodeURI(MAP_SRC);
     return '<div class="map" id="map">' +
-      '<img id="mapimg" src="' + src + '?v=1" alt="김장대첩 행사장 지도" draggable="false">' +
+      '<img id="mapimg" src="' + src + '?v=2" alt="김장대첩 행사장 지도" draggable="false">' +
       '<div class="map-hint" id="maphint">두 손가락으로 확대 · 끌어서 이동</div>' +
       '<div class="map-ctl"><button type="button" data-z="in" aria-label="확대">+</button>' +
       '<button type="button" data-z="out" aria-label="축소">−</button>' +
       '<button type="button" data-z="fit" aria-label="전체 보기">⤢</button></div></div>' +
-      '<div class="map-legend" role="group" id="maplegend" aria-label="지도 범례"><div class="row"><span class="dots">' + MAP_LEGEND.map(function (l, k) {
-        return '<button type="button" class="lg" data-lg="' + k + '" aria-label="' + esc(l.n) + ' 미션 보기"><i class="dot" style="background:' + l.c + '"></i></button>';
-      }).join("") + '</span><span class="cap">' + esc(MAP_LEGEND_CAP) + '</span></div>' +
-      '<div class="row"><span class="dots">' + MAP_SPECIAL.map(function (s, k) {
-        return '<button type="button" class="lg lgs" data-lg="s' + k + '" aria-label="' + esc(s.n) + ' 미션 보기">' + emoHtml(s) + "</button>";
-      }).join("") + '</span><span class="cap">' + esc(MAP_LEGEND_SPECIAL) + "</span></div>" +
-      '<span class="tip">' + esc(MAP_LEGEND_TIP) + "</span></div>" +
       '<div class="map-pop-bg" id="mappopbg" hidden></div><div class="map-pop" id="mappop" role="dialog" aria-live="polite" hidden></div>' +
       '<p class="map-sub">잘 안 보이면 <a href="' + src + '" target="_blank" rel="noopener">지도 원본 이미지 열기</a></p>';
   }
