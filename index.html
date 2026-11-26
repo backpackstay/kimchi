@@ -157,6 +157,9 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 24px}
 #intro.end{background:#FF5F18}
 #intro.end #st{opacity:0;transition:opacity .15s}
 #intro.out{opacity:0;pointer-events:none}
+#iv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#1B1B1B}
+#intro.vid #st{display:none}
+@media (min-aspect-ratio:1/1){#iv{object-fit:contain}} /* 가로 화면(PC)에서는 영상이 잘리지 않게 */
 #st{position:absolute;left:50%;top:50%;width:1080px;height:1920px;margin:-960px 0 0 -540px;transform-origin:50% 50%}
 #st .glow{position:absolute;inset:0;opacity:0;background:radial-gradient(ellipse at center,rgba(255,95,24,.10),rgba(0,0,0,0) 55%)}
 #st .g{position:absolute;left:0;top:0;width:1080px;height:1920px;display:flex;flex-direction:column;align-items:center;justify-content:center;will-change:transform}
@@ -203,6 +206,7 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
 <!-- 인트로: 처음 들어왔을 때 한 번만 로고 연출(약 3초)을 보여주고, 줌인되며 공지 화면으로 넘어갑니다.
      로고 글자를 바꾸려면 아래 eb(위 작은 글씨) · tt(큰 글씨) · sb(아래 작은 글씨) 안의 글자를 고치면 됩니다. -->
 <div id="intro" hidden>
+  <video id="iv" muted playsinline webkit-playsinline preload="auto" aria-hidden="true" hidden></video>
   <div id="st" aria-hidden="true">
     <div class="glow"></div>
     <div class="g"><div class="eb">BACKPACK STAY</div><div class="tt">김장대첩</div><div class="br"></div><div class="sb">2026 · KIMCHI ROAD TRAIL</div></div>
@@ -252,8 +256,31 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
   /* 글꼴이 준비되면 시작 (늦어도 1.2초 안에 시작) */
   var started = false;
   function go() { if (!started) { started = true; requestAnimationFrame(run); } }
-  try { Promise.all([document.fonts.load('400 232px "Black Han Sans"', "김장대첩"), document.fonts.load('600 40px "IBM Plex Mono"', "BACKPACK")]).then(go, go); } catch (e) { go(); }
-  setTimeout(go, 1200);
+  /* 인트로 영상(intro.mp4)을 먼저 재생. 영상을 바꾸려면 같은 이름으로 덮어 올리고 아래 ?v= 숫자를 바꾸면 됩니다.
+     영상이 3.5초 안에 재생되지 않으면(자동재생 차단 등) 아래 로고 애니메이션으로 대신 보여줍니다. */
+  var iv = document.getElementById("iv"), mode = "wait", safety;
+  function anim() {
+    if (mode !== "wait") return; mode = "anim";
+    if (iv) { try { iv.pause(); } catch (e) {} iv.remove(); iv = null; }
+    try { Promise.all([document.fonts.load('400 232px "Black Han Sans"', "김장대첩"), document.fonts.load('600 40px "IBM Plex Mono"', "BACKPACK")]).then(go, go); } catch (e) { go(); }
+    setTimeout(go, 1200);
+    safety = setTimeout(reveal, 7000); /* 어떤 이유로 멈춰도 7초 뒤엔 화면을 보여줌 */
+  }
+  function vid() {
+    if (mode !== "wait") return; mode = "vid";
+    box.classList.add("vid");
+    var d = iv.duration;
+    safety = setTimeout(reveal, ((isFinite(d) && d > 0) ? Math.min(d, 30) + 2 : 20) * 1000);
+  }
+  if (iv && iv.canPlayType && iv.canPlayType("video/mp4")) {
+    iv.addEventListener("playing", vid);
+    iv.addEventListener("ended", reveal);
+    iv.addEventListener("error", anim);
+    iv.src = "intro.mp4?v=20261126";
+    iv.hidden = false;
+    try { var p = iv.play(); if (p && p.catch) p.catch(anim); } catch (e) { anim(); }
+    setTimeout(anim, 3500);
+  } else anim();
   function reveal() {
     if (done) return; done = true;
     box.classList.add("end");
@@ -265,7 +292,6 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
     }); });
   }
   document.getElementById("skip").addEventListener("click", reveal);
-  setTimeout(reveal, 7000); /* 어떤 이유로 멈춰도 7초 뒤엔 화면을 보여줌 */
 })();
 </script>
 
