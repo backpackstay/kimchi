@@ -159,6 +159,9 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 24px}
 #intro.out{opacity:0;pointer-events:none}
 #iv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#1B1B1B}
 #intro.vid #st{display:none}
+#snd{display:none;position:absolute;left:max(16px,env(safe-area-inset-left));bottom:calc(20px + env(safe-area-inset-bottom));border:1px solid rgba(255,250,236,.35);background:rgba(27,27,27,.4);color:#FFFAEC;border-radius:999px;padding:7px 14px;font:500 13px var(--body);cursor:pointer}
+#intro.vid #snd{display:block}
+#intro.vid #snd.on{display:none}
 @media (min-aspect-ratio:1/1){#iv{object-fit:contain}} /* 가로 화면(PC)에서는 영상이 잘리지 않게 */
 #st{position:absolute;left:50%;top:50%;width:1080px;height:1920px;margin:-960px 0 0 -540px;transform-origin:50% 50%}
 #st .glow{position:absolute;inset:0;opacity:0;background:radial-gradient(ellipse at center,rgba(255,95,24,.10),rgba(0,0,0,0) 55%)}
@@ -212,6 +215,7 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
     <div class="g"><div class="eb">BACKPACK STAY</div><div class="tt">김장대첩</div><div class="br"></div><div class="sb">2026 · KIMCHI ROAD TRAIL</div></div>
     <div class="ov"></div>
   </div>
+  <button id="snd" type="button">🔊 소리 켜기</button>
   <button id="skip" type="button">건너뛰기</button>
 </div>
 <script>
@@ -292,6 +296,13 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
     }); });
   }
   document.getElementById("skip").addEventListener("click", reveal);
+  /* 휴대폰은 소리 있는 자동재생을 막으므로 음소거로 시작하고, 누르면 소리를 켭니다 */
+  document.getElementById("snd").addEventListener("click", function () {
+    if (!iv) return;
+    iv.muted = false; iv.volume = 1;
+    if (iv.paused) { try { var p = iv.play(); if (p && p.catch) p.catch(function () {}); } catch (e) {} }
+    this.classList.add("on");
+  });
 })();
 </script>
 
