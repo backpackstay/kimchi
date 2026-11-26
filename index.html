@@ -157,7 +157,8 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 24px}
 #intro.end{background:#FF5F18}
 #intro.end #st{opacity:0;transition:opacity .15s}
 #intro.out{opacity:0;pointer-events:none}
-#iv{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#1B1B1B} /* 영상 전체가 보이게 (세로로 긴 휴대폰에서 양옆 잘림 방지) */
+#iv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 50%;background:#1B1B1B} /* 화면을 꽉 채움 (검은 여백 없음). 화면 비율에 맞는 영상 파일은 아래 스크립트가 고름 */
+#iv.fit{object-fit:contain}
 #intro.vid #st{display:none}
 #snd{display:none;position:absolute;left:max(16px,env(safe-area-inset-left));bottom:calc(20px + env(safe-area-inset-bottom));border:1px solid rgba(255,250,236,.35);background:rgba(27,27,27,.4);color:#FFFAEC;border-radius:999px;padding:7px 14px;font:500 13px var(--body);cursor:pointer}
 #intro.vid #snd{display:block}
@@ -278,7 +279,13 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
     iv.addEventListener("playing", vid);
     iv.addEventListener("ended", reveal);
     iv.addEventListener("error", anim);
-    iv.src = "intro.mp4?v=20261126";
+    /* 화면 비율에 맞춰 영상 파일을 고릅니다.
+       - 세로로 긴 화면(아이폰 · 갤럭시 S · 폴드 바깥 화면): intro.mp4 (위아래 하늘·땅을 늘린 세로 영상)
+       - 정사각형에 가까운 화면(폴드 안쪽 화면 · 태블릿): intro_wide.mp4 (양옆을 흐린 배경으로 채운 넓은 영상)
+       두 파일 모두 화면을 꽉 채우고(cover), 가로가 아주 긴 PC 화면에서만 영상 전체가 보이게(contain) 둡니다. */
+    var ar = innerWidth / Math.max(1, innerHeight);
+    iv.src = (ar > 0.74 ? "intro_wide.mp4" : "intro.mp4") + "?v=20261126b";
+    if (ar > 1.35) iv.classList.add("fit");
     iv.hidden = false;
     try { var p = iv.play(); if (p && p.catch) p.catch(anim); } catch (e) { anim(); }
     setTimeout(anim, 3500);
