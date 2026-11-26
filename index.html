@@ -117,40 +117,39 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 24px}
 .map-err{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;color:var(--muted);font-size:14px}
 .map-sub{margin:10px 2px 0;font-size:13px;color:var(--muted)}
 .map-sub a{color:var(--accent)}
-/* 지도 범례 · 미션 팝업 (운영진 보드와 같은 디자인) */
-.map-legend .row{display:contents}
-.map-legend{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:7px 12px;margin:10px 2px 0;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);font-size:13px;color:var(--ink)}
-.map-legend .dots{display:flex;align-items:center;margin:0 -6px}
-.map-legend .lg{display:inline-flex;align-items:center;justify-content:center;padding:10px 6px;margin:-10px 0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.map-legend .lg:active .dot,.map-legend .lg:focus-visible .dot{transform:scale(1.35)}
-.map-legend .lg .dot{transition:transform .12s}
-.map-legend .lg{width:23px;padding:10px 0;flex:none}
-.map-legend .lgs{font:inherit;color:inherit}
-.svgemo{width:1.15em;height:1.15em;display:block}
-.emo{display:inline-flex;align-items:center;justify-content:center}
-.map-legend .lgs .emo{transition:transform .12s}
-.map-legend .lgs:active .emo,.map-legend .lgs:focus-visible .emo{transform:scale(1.25)}
-.map-legend .tip{grid-column:1/-1;justify-self:end;font-size:12px;color:var(--muted);margin-top:-2px}
-/* 미션 팝업: 세로형 카드 (위 이미지 3:4 + 아래 미션 이름) */
+/* 지도 범례 · 팝업 카드 (지도 그림의 주황 = 미션존, 초록 = 편의시설) */
+.map-legend{margin:10px 2px 0;padding:10px 12px 8px;border:1px solid var(--line);border-radius:10px;background:var(--surface);font-size:13px;color:var(--ink)}
+.map-legend .row{display:flex;align-items:center;gap:10px;padding:3px 0}
+.map-legend .nums{display:flex;flex-wrap:wrap;gap:6px 7px;flex:1;min-width:0;padding-top:4px}
+.map-legend .cap{flex:none;font-size:12px;color:var(--muted);white-space:nowrap}
+.map-legend .tip{text-align:right;font-size:12px;color:var(--muted);margin-top:4px}
+.spot{position:relative;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;flex:none;color:#fff;font:400 16px/1 var(--body);letter-spacing:-.05em;font-style:normal}
+.spot .bl{position:absolute;inset:0;width:100%;height:100%}
+.spot.or .bl{fill:#FF4E00}.spot.gr .bl{fill:#2D8521}
+.spot b{position:relative;font-weight:400}
+.spot .sr{position:absolute;right:-9px;top:-10px;width:60%;height:60%;overflow:visible}
+.spot .sr path{fill:#FECE00;stroke:#1A6E0A;stroke-width:9;stroke-linejoin:round;paint-order:stroke}
+.map-legend .lg{padding:3px 1px;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.map-legend .lg .spot{transition:transform .12s}
+.map-legend .lg:active .spot,.map-legend .lg:focus-visible .spot{transform:scale(1.2)}
+/* 팝업 카드 */
 .map-pop-bg{position:fixed;inset:0;z-index:49;background:rgba(0,0,0,.5)}
-.map-pop{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:50;box-sizing:border-box;width:min(340px,calc(100vw - 40px),calc((100svh - 150px) * .75));display:flex;flex-direction:column;border-radius:16px;overflow:hidden;background:var(--surface);color:var(--ink);box-shadow:0 12px 40px rgba(0,0,0,.35);animation:mappop .16s ease-out}
+.map-pop{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:50;box-sizing:border-box;width:min(360px,calc(100vw - 40px));min-height:min(420px,calc(100svh - 120px));max-height:calc(100svh - 120px);overflow:auto;display:flex;flex-direction:column;border-radius:16px;background:var(--surface);color:var(--ink);box-shadow:0 12px 40px rgba(0,0,0,.35);animation:mappop .16s ease-out}
 .map-pop[hidden],.map-pop-bg[hidden]{display:none}
-.map-pop .pimg{position:relative;aspect-ratio:3/4;background:var(--surface-2);overflow:hidden}
-.map-pop .pimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.map-pop .pimg .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted);font-size:13px}
-.map-pop .pimg .ph .big{font-size:56px;line-height:1}
-.map-pop .pimg .ph .big .svgemo{width:64px;height:64px}
-.map-pop .pimg .ph .dot{width:56px;height:56px}
-.map-pop .pcap{display:flex;align-items:flex-start;gap:9px;padding:12px 14px 6px;font-size:16px;font-weight:700;line-height:1.4;word-break:keep-all;overflow-wrap:anywhere}
-.map-pop .pcap .emo,.map-pop .pcap .dot{margin-top:3px}
-.map-pop .pdesc{margin:0;padding:0 14px 8px 14px;font-size:14px;line-height:1.5;color:var(--ink);word-break:keep-all;overflow-wrap:anywhere}
-.map-pop .pclose{padding:0 14px 12px;font-size:12px;color:var(--muted)}
-.map-pop .dot{width:14px;height:14px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.map-pop .phead{display:flex;align-items:center;gap:11px;padding:16px 16px 12px;border-bottom:4px solid var(--kc,#FF4E00)}
+.map-pop .phead .spot{width:42px;height:42px;font-size:21px;margin-top:4px}
+.map-pop .ptit{font-size:17px;font-weight:700;line-height:1.3;word-break:keep-all}
+.map-pop .ptag{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-top:2px}
+.map-pop .psec{padding:12px 16px;border-top:1px solid var(--line)}
+.map-pop .phead + .psec{border-top:0}
+.map-pop .psec h4{margin:0 0 5px;font-size:12px;font-weight:700;letter-spacing:.02em;color:var(--kc,#FF4E00)}
+.map-pop .psec p{margin:0;font-size:14px;line-height:1.55;white-space:pre-line;word-break:keep-all;overflow-wrap:anywhere}
+.map-pop .psec p.tbd{color:var(--muted)}
+/* 카드 크기 통일: 주황·초록 카드 모두 같은 최소 높이, 남는 공간은 가운데 설명 칸이 채움 */
+.map-pop .psec.pmain{flex:1 0 auto}
+.map-pop .pclose{padding:6px 16px 14px;font-size:12px;color:var(--muted)}
 @keyframes mappop{from{opacity:0;transform:translate(-50%,-47%) scale(.97)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
-@media (prefers-reduced-motion:reduce){.map-pop{animation:none}.map-legend .lg .dot{transition:none}}
-.map-legend .dot{width:11px;height:11px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
-.map-legend .emo{font-size:13px;line-height:1}
-.map-legend .cap{color:var(--ink)}
+@media (prefers-reduced-motion:reduce){.map-pop{animation:none}.map-legend .lg .spot{transition:none}}
 
 /* 인트로 (영상 파일 대신 페이지가 직접 그리는 애니메이션 — 휴대폰·카톡 브라우저에서도 동작) */
 #intro{position:fixed;inset:0;z-index:100;background:#1B1B1B;overflow:hidden;transition:opacity .7s ease .1s}
@@ -535,27 +534,37 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
   var MAP_SRC = "김장대첩지도.png";
   var MAP_ALT = "김장대첩지도.PNG"; /* 위 이름으로 못 찾으면 이 이름으로 한 번 더 찾아봄 */
 
-  /* 지도 범례: 같은 색 = 같은 리워드를 주는 미션. m 은 동그라미를 누르면 팝업으로 뜨는 미션 이름입니다 */
-  /* img 는 팝업 카드에 뜨는 미션 이미지 파일 이름입니다 (같은 저장소에 올려 주세요).
-     .jpg 가 없으면 같은 이름의 .png 를 찾고, 둘 다 없으면 '이미지 준비 중' 카드가 뜹니다. 세로 3:4 비율(예: 900×1200)을 권장해요 */
-  var MAP_LEGEND = [
-    { c: "#2F6FE4", n: "파란색", m: "배추 일병 구하기", img: "mission_blue.jpg" },
-    { c: "#E23B3B", n: "빨간색", m: "손에 손잡고", img: "mission_red.jpg" },
-    { c: "#F28C28", n: "주황색", m: "너마늘 사랑한다했잖아", img: "mission_orange.jpg" },
-    { c: "#8E4EC6", n: "보라색", m: "발목에 걸리는건 죄가 아니잖아!", img: "mission_purple.jpg" },
-    { c: "#F2C81E", n: "노란색", m: "네땅도 내땅, 내땅도 내땅", img: "mission_yellow.jpg" }
+  /* 지도 범례 번호와 팝업 카드 내용 — 지도 그림(김장대첩지도.png)의 번호와 같아요.
+     type: "mission" = 주황 미션존 카드 (위치 · 게임 설명 · 리워드)
+           "facility" = 초록 편의시설 카드 (위치 · 설명)
+     star: true 면 번호 옆에 노란 별이 붙어요. 비워 둔 칸("")은 카드에 '준비 중'으로 보여요.
+     addr = 주소, desc = 게임 설명(미션) / 설명(시설), reward = 리워드. 줄을 바꾸려면 \n 을 넣으세요. */
+  var MAP_SPOTS = [
+    { no: 1,  type: "mission",  star: true, name: "무주초등학교",       tag: "미션존 · 화장실",   addr: "", desc: "", reward: "" },
+    { no: 2,  type: "mission",  star: true, name: "카페힐록",           tag: "히든 미션존",       addr: "", desc: "", reward: "" },
+    { no: 3,  type: "mission",  star: true, name: "무주반딧불시장",     tag: "미션존 · 화장실",   addr: "", desc: "", reward: "" },
+    { no: 5,  type: "mission",  star: true, name: "무주초등학교 강당",  tag: "미션존 · 화장실",   addr: "", desc: "", reward: "" },
+    { no: 6,  type: "mission",  star: true, name: "무주공원 / 풋살장",  tag: "미션존 · 화장실",   addr: "", desc: "", reward: "" },
+    { no: 8,  type: "mission",  star: true, name: "카페따숲",           tag: "히든 미션존",       addr: "", desc: "", reward: "" },
+    { no: 12, type: "mission",  star: true, name: "반딧불체육관",       tag: "화장실 · 미션존",   addr: "", desc: "", reward: "" },
+    { no: 4,  type: "facility", name: "대중한증사우나",                 tag: "편의시설",          addr: "", desc: "" },
+    { no: 7,  type: "facility", name: "식당가 - 쿠폰사용존",            tag: "식당가 · 편의시설", addr: "", desc: "" },
+    { no: 9,  type: "facility", name: "식당가 - 쿠폰사용존",            tag: "식당가 · 편의시설", addr: "", desc: "" },
+    { no: 10, type: "facility", name: "지남공원 P1 주차장",             tag: "편의시설",          addr: "", desc: "" },
+    { no: 11, type: "facility", name: "무주 등나무운동장",              tag: "화장실",            addr: "", desc: "" }
   ];
-  /* 특별 리워드 줄: e 는 이모티콘, m 은 누르면 팝업에 뜨는 미션 이름. 무는 휴대폰에 이모티콘이 없어 그림(MU_SVG)으로 넣었습니다, d 는 미션 이름 아래 설명(없으면 안 보임) */
-  var MU_SVG = '<svg class="svgemo" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7.500C10 4.500 7 3.500 5 4.500c1 2.200 3.200 3.800 6.500 3.600zM11.800 7.500c-.3-3 .9-5.300 3-6.300 1 2.200 0 5-2.200 6.800zM12.500 7.800c2-2.200 5-3 7-2-1.200 2.200-4 3.600-7 2.800z" fill="#4CAF50"/><path d="M8 8.800c2-1.500 6-1.500 8 0 1.500 2 .5 6.800-1.500 10.200-1 1.800-1.900 3.500-2.500 3.500s-1.500-1.700-2.500-3.500C7.500 15.600 6.500 10.800 8 8.800z" fill="#FFFDF5" stroke="#A9A38F" stroke-width="1"/></svg>';
-  var MAP_SPECIAL = [
-    { e: "🌶️", n: "고추", m: "힐록 숨은 미션", d: '"사장님 김치추가" 주문하세요. 숨은 미션이 나올지도\u00a0~', img: "mission_pepper.jpg" },
-    { e: "🫚", n: "생강", m: "생강 헤는 밤", img: "mission_ginger.jpg" },
-    { e: "🥬", n: "배추", m: "김치맨을 찾아라!", d: "무주시내를 누비는 김치맨을 찾으신다면 당신은 행운아!", img: "mission_cabbage.jpg" }
-  ];
-  function emoHtml(s) { return '<span class="emo">' + (s.h || esc(s.e)) + "</span>"; }
-  var MAP_LEGEND_TIP ="*이모티콘을 눌러보세요.";
-  var MAP_LEGEND_SPECIAL = "특별 리워드"; /* 배추 이모티콘 옆 글자 */
-  var MAP_LEGEND_CAP ="같은 색 미션은 같은 리워드를 드려요";
+  var MAP_ROW_MISSION = "미션존";      /* 윗줄(주황) 오른쪽 글자 */
+  var MAP_ROW_FACILITY = "편의시설";   /* 아랫줄(초록) 오른쪽 글자 */
+  var MAP_LEGEND_TIP = "*번호를 눌러보세요.";
+  /* 번호 아이콘: 지도 그림의 번호 모양(울퉁불퉁한 구름 모양)과 별을 그대로 따라 그린 그림 */
+  var SPOT_BLOB = '<svg class="bl" viewBox="0 0 100 100" aria-hidden="true"><path d="M54.3 95.9C50.5 96.8 50.2 96.4 47.6 95.9C45.1 95.4 42.3 93.1 39.0 92.8C35.6 92.6 31.0 94.5 27.7 94.4C24.3 94.3 21.1 93.0 19.0 92.3C16.9 91.6 16.6 91.5 15.0 90.2C13.3 88.9 11.2 87.5 9.3 84.6C7.4 81.6 4.5 78.1 3.6 72.5C2.6 66.8 2.9 56.0 3.6 50.7C4.2 45.4 5.6 43.4 7.3 40.9C9.0 38.5 11.8 36.9 14.0 35.9C16.1 35.0 18.6 35.6 20.0 35.3C21.4 34.9 21.1 36.9 22.2 33.8C23.4 30.7 25.1 20.5 26.8 16.6C28.5 12.8 30.6 12.2 32.3 10.8C34.0 9.3 35.1 8.8 37.2 8.0C39.3 7.2 42.2 6.3 45.0 6.0C47.9 5.7 50.6 5.4 54.3 6.1C57.9 6.9 63.7 9.9 67.0 10.7C70.3 11.5 71.1 10.4 74.0 11.1C77.0 11.7 82.1 13.6 84.5 14.5C86.9 15.5 86.9 15.4 88.5 16.7C90.2 18.0 92.7 19.8 94.3 22.5C95.9 25.2 97.7 27.8 98.3 32.8C99.0 37.7 98.5 48.2 98.1 52.3C97.8 56.5 97.2 56.1 96.2 57.8C95.3 59.4 94.6 58.6 92.4 62.2C90.2 65.8 85.8 75.2 83.0 79.3C80.2 83.4 77.8 84.9 75.6 86.8C73.5 88.7 73.5 89.1 70.0 90.6C66.4 92.1 58.0 95.0 54.3 95.9Z"/></svg>';
+  var SPOT_STAR = '<svg class="sr" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 8C53 8 55 11 57 16L63 31 79 32C85 32 88 34 89 37 90 40 88 43 84 46L72 56 76 72C77 78 77 81 74 83 72 85 68 84 64 81L50 72 36 81C32 84 28 85 26 83 23 81 23 78 24 72L28 56 16 46C12 43 10 40 11 37 12 34 15 32 21 32L37 31 43 16C45 11 47 8 50 8Z"/></svg>';
+  function spotHtml(s) { return '<i class="spot ' + (s.type === "mission" ? "or" : "gr") + '">' + SPOT_BLOB + "<b>" + s.no + "</b>" + (s.star ? SPOT_STAR : "") + "</i>"; }
+  function legendRow(type, cap) {
+    return '<div class="row"><span class="nums">' + MAP_SPOTS.filter(function (s) { return s.type === type; }).map(function (s) {
+      return '<button type="button" class="lg" data-spot="' + s.no + '" aria-label="' + s.no + "번 " + esc(s.name) + ' 보기">' + spotHtml(s) + "</button>";
+    }).join("") + '</span><span class="cap">' + esc(cap) + "</span></div>";
+  }
 
   function mapHtml() {
     var src = encodeURI(MAP_SRC);
@@ -565,35 +574,33 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
       '<div class="map-ctl"><button type="button" data-z="in" aria-label="확대">+</button>' +
       '<button type="button" data-z="out" aria-label="축소">−</button>' +
       '<button type="button" data-z="fit" aria-label="전체 보기">⤢</button></div></div>' +
+      '<div class="map-legend" role="group" id="maplegend" aria-label="지도 범례">' + legendRow("mission", MAP_ROW_MISSION) + legendRow("facility", MAP_ROW_FACILITY) +
+      '<div class="tip">' + esc(MAP_LEGEND_TIP) + "</div></div>" +
       '<div class="map-pop-bg" id="mappopbg" hidden></div><div class="map-pop" id="mappop" role="dialog" aria-live="polite" hidden></div>' +
       '<p class="map-sub">잘 안 보이면 <a href="' + src + '" target="_blank" rel="noopener">지도 원본 이미지 열기</a></p>';
   }
 
   /* 범례 동그라미를 누르면 미션 이름 팝업 · 화면 아무 곳이나 누르면 닫힘 */
   function hideMapPop() { var p = $("mappop"), bg = $("mappopbg"); if (p) p.hidden = true; if (bg) bg.hidden = true; }
-  /* 이미지가 .jpg 로 없으면 .png 로 한 번 더 찾고, 그래도 없으면 '준비 중' 표시 */
-  window.kjPopImgErr = function (img) {
-    var alt = img.getAttribute("data-alt");
-    if (alt) { img.removeAttribute("data-alt"); img.src = alt; return; }
-    img.remove();
-  };
-  document.addEventListener("pointerdown", hideMapPop, true);
+  /* 카드 바깥을 누르면 바로 닫히고, 카드 안은 스크롤할 수 있게 '누르고 뗐을 때'만 닫힘 */
+  document.addEventListener("pointerdown", function (e) { if (!(e.target.closest && e.target.closest("#mappop"))) hideMapPop(); }, true);
+  document.addEventListener("click", function (e) { if (e.target.closest && e.target.closest("#mappop")) hideMapPop(); });
   document.addEventListener("keydown", function (e) { if (e.key === "Escape") hideMapPop(); });
   document.addEventListener("click", function (e) {
-    var b = e.target.closest && e.target.closest("[data-lg]"), p = $("mappop"), lg = $("maplegend");
-    if (!b || !p || !lg) return;
-    var id = b.getAttribute("data-lg"), sp = id.charAt(0) === "s", l = sp ? MAP_SPECIAL[+id.slice(1)] : MAP_LEGEND[+id], r = lg.getBoundingClientRect();
-    if (!l) return;
-    var icon = sp ? emoHtml(l) : '<i class="dot" style="background:' + l.c + '"></i>';
-    var img = "";
-    if (l.img) {
-      var src = encodeURI(l.img), png = /\.jpe?g$/i.test(l.img) ? encodeURI(l.img.replace(/\.jpe?g$/i, ".png")) : "";
-      img = '<img src="' + src + '" alt="' + esc(l.m) + '"' + (png ? ' data-alt="' + png + '"' : "") + ' onerror="kjPopImgErr(this)">';
+    var b = e.target.closest && e.target.closest("[data-spot]"), p = $("mappop");
+    if (!b || !p) return;
+    var no = +b.getAttribute("data-spot"), s = MAP_SPOTS.filter(function (x) { return x.no === no; })[0];
+    if (!s) return;
+    var mission = s.type === "mission";
+    function sec(title, txt, main) {
+      return '<div class="psec' + (main ? " pmain" : "") + '"><h4>' + title + "</h4>" + (txt ? "<p>" + esc(txt) + "</p>" : '<p class="tbd">준비 중이에요</p>') + "</div>";
     }
-    p.innerHTML = '<div class="pimg"><div class="ph"><span class="big">' + icon + "</span>미션 이미지 준비 중</div>" + img + "</div>" +
-      '<div class="pcap">' + icon + "<span>" + esc(l.m) + "</span></div>" +
-      (l.d ? '<p class="pdesc">' + esc(l.d) + "</p>" : "") +
+    p.style.setProperty("--kc", mission ? "#FF4E00" : "#2D8521");
+    p.innerHTML = '<div class="phead">' + spotHtml(s) + '<div class="ptit">' + esc(s.name) + '<span class="ptag">' + esc(s.tag || "") + "</span></div></div>" +
+      sec("위치", s.addr) +
+      (mission ? sec("게임 설명", s.desc, 1) + sec("리워드", s.reward) : sec("설명", s.desc, 1)) +
       '<div class="pclose">화면 아무 곳이나 누르면 닫혀요</div>';
+    p.scrollTop = 0;
     p.hidden = false; var bg = $("mappopbg"); if (bg) bg.hidden = false;
   });
   function setupMap() {
