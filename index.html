@@ -13,7 +13,7 @@
 <script>
 /* 새 버전 자동 확인: 카톡 등이 예전 저장본을 보여 줄 때, version.txt와 비교해 최신 페이지로 한 번 새로 엽니다.
    GitHub에 올릴 때마다 아래 PAGE_VER와 version.txt 안의 글자를 똑같이 바꿔 주세요. */
-var PAGE_VER = "20261127a";
+var PAGE_VER = "20261127b";
 (function () {
   if (!window.fetch || !window.URL) return;
   fetch("version.txt?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.text() : ""; }).then(function (v) {
@@ -163,6 +163,13 @@ footer{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 24px}
 .map-pop .psec p.tbd{color:var(--muted)}
 /* 카드 크기 통일: 주황·초록 카드 모두 같은 최소 높이, 남는 공간은 가운데 설명 칸이 채움 */
 .map-pop .psec.pmain{flex:1 0 auto}
+/* 식당가 카드: 식당명 · 주메뉴 · 주소 목록 */
+.map-pop .shops{list-style:none;margin:2px 0 0;padding:0}
+.map-pop .shop{padding:10px 0;border-top:1px dashed var(--line)}
+.map-pop .shop:first-child{border-top:0;padding-top:2px}
+.map-pop .shop .sn{font-size:15px;font-weight:700;line-height:1.35;word-break:keep-all}
+.map-pop .shop .sm{display:inline-block;margin-top:5px;padding:2px 9px;border-radius:999px;background:rgba(45,133,33,.15);color:var(--kc,#2D8521);font-size:12.5px;font-weight:700;line-height:1.5;word-break:keep-all}
+.map-pop .shop .sa{margin-top:5px;font-size:12.5px;line-height:1.45;color:var(--muted);word-break:keep-all;overflow-wrap:anywhere}
 .map-pop .pclose{padding:6px 16px 14px;font-size:12px;color:var(--muted)}
 @keyframes mappop{from{opacity:0;transform:translate(-50%,-47%) scale(.97)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 @media (prefers-reduced-motion:reduce){.map-pop{animation:none}.map-legend .lg .spot{transition:none}}
@@ -588,8 +595,21 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
     { no: 8,  type: "mission",  star: true, name: "카페따숩",           tag: "히든 미션존",       addr: "전북 무주군 무주읍 당산강변로 188", desc: "카페 따숩에 도착하여 진정한 진저를 찾아보세요! 진저를 찾아 숨은 미션을 수행하세요. 장원이 될 사람을 찾고 있어요. 산타지에서 준비한 풍성한 선물이 기다립니다.", reward: "와 보면 알게 될 거야~" },
     { no: 12, type: "mission",  star: true, name: "반딧불체육관",       tag: "화장실 · 미션존",   addr: "전북 무주군 무주읍 한풍루로 326-28", desc: "너 왕년에 딱지 좀 쳐봤니? 이번엔 뒤집기야~", reward: "이기면 알려 줄게!" },
     { no: 4,  type: "facility", name: "대중한증사우나",                 tag: "편의시설",          addr: "전북 무주군 무주읍 당산강변로 146", desc: "18:00까지 운영해요! \n 성인 8,000원 소인(7세미만) 6,000원 !" },
-    { no: 7,  type: "facility", name: "식당가 - 쿠폰사용존",            tag: "식당가 · 편의시설", addr: "", desc: "" },
-    { no: 9,  type: "facility", name: "식당가 - 쿠폰사용존",            tag: "식당가 · 편의시설", addr: "", desc: "" },
+    /* 식당가 카드: shops 목록에 { name: 식당명, menu: 주메뉴, addr: 주소 } 를 한 줄씩 넣으면 목록으로 보여요. desc = 맨 위 짧은 안내(비워도 됨) */
+    { no: 7,  type: "facility", name: "식당가 - 쿠폰사용존",            tag: "식당가 · 편의시설", desc: "소비쿠폰을 쓸 수 있는 식당이에요.", shops: [
+      { name: "유가네한우곰탕 무주점", menu: "곰탕 · 설렁탕 · 육개장", addr: "무주읍 단천로" },
+      { name: "금강식당", menu: "빠가 어죽", addr: "무주읍 단천로" },
+      { name: "온칼국수", menu: "동죽칼국수 · 쭈꾸미볶음 (2인 이상 주문)", addr: "무주읍 주계로8길" },
+      { name: "모둔이의하우스", menu: "콩나물국밥 · 백반", addr: "무주읍 주계로8길" },
+      { name: "카페따숩", menu: "커피", addr: "무주읍 당산강변로" },
+    ] },
+    { no: 9,  type: "facility", name: "식당가 - 쿠폰사용존",            tag: "식당가 · 편의시설", desc: "소비쿠폰을 쓸 수 있는 식당이에요.", shops: [
+      { name: "소문난시골순대", menu: "시골순대국밥 · 막창순대", addr: "무주읍 장터로 (반딧불시장)" },
+      { name: "반딧불옛날순대", menu: "순대국밥", addr: "무주읍 장터로 (반딧불시장)" },
+      { name: "오뚜기식당", menu: "순대국밥", addr: "무주읍 장터로 (반딧불시장)" },
+      { name: "천마찹쌀꽈배기", menu: "꽈배기", addr: "무주읍 장터로 (반딧불시장)" },
+      { name: "카페힐록", menu: "커피", addr: "무주읍 죽산길" },
+    ] },
     { no: 10, type: "facility", name: "지남공원 P1 주차장",             tag: "편의시설",          addr: "전북 무주군 무주읍 당산리 1182", desc: "공식 주차장이에요! \n 만차라면 안으로 더 들어오기!" },
     { no: 11, type: "facility", name: "무주 등나무운동장",              tag: "화장실",            addr: "전북 무주군 무주읍 한풍루로 326-14", desc: "운동장에서의 하룻밤.. \n 기대되지않나요?" },
     /* type: "special" = 노란 특별미션 카드 (지도에 위치 없음 · 번호 대신 icon) — addr = 언제·어디서, desc = 참여 방법 */
@@ -640,7 +660,22 @@ html.intro-reveal .top,html.intro-reveal .bar,html.intro-reveal main,html.intro-
     function sec(title, txt, main) {
       return '<div class="psec' + (main ? " pmain" : "") + '"><h4>' + title + "</h4>" + (txt ? "<p>" + esc(txt) + "</p>" : '<p class="tbd">준비 중이에요</p>') + "</div>";
     }
+    function shopSec(list) {
+      if (!list.length) return sec("식당", "", 1);
+      return '<div class="psec pmain"><h4>식당 ' + list.length + "곳</h4><ul class=\"shops\">" + list.map(function (x) {
+        return '<li class="shop"><div class="sn">' + esc(x.name || "") + "</div>" +
+          (x.menu ? '<span class="sm">' + esc(x.menu) + "</span>" : "") +
+          (x.addr ? '<div class="sa">📍 ' + esc(x.addr) + "</div>" : "") + "</li>";
+      }).join("") + "</ul></div>";
+    }
     p.style.setProperty("--kc", mission ? "#FF4E00" : special ? "#B8860B" : "#2D8521");
+    if (s.shops) {
+      p.innerHTML = '<div class="phead">' + spotHtml(s) + '<div class="ptit">' + esc(s.name) + '<span class="ptag">' + esc(s.tag || "") + "</span></div></div>" +
+        (s.desc ? sec("안내", s.desc) : "") + shopSec(s.shops) + '<div class="pclose">화면 아무 곳이나 누르면 닫혀요</div>';
+      p.scrollTop = 0;
+      p.hidden = false; var bg0 = $("mappopbg"); if (bg0) bg0.hidden = false;
+      return;
+    }
     p.innerHTML = '<div class="phead">' + spotHtml(s) + '<div class="ptit">' + esc(s.name) + '<span class="ptag">' + esc(s.tag || "") + "</span></div></div>" +
       (special ? sec("언제 · 어디서", s.addr) + sec("참여 방법", s.desc, 1) + sec("리워드", s.reward) :
        sec("위치", s.addr) +
